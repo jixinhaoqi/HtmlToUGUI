@@ -148,8 +148,8 @@ namespace Xxhq.Htmltougui.Editor
                 if (!string.IsNullOrEmpty(path))
                 {
                     _htmlToolPath = path;
-                    _htmlToolRelativePath = ResourceLoader.GetRelativeAssetsOrPackagesPath(_htmlToolPath);
-                    EditorPrefs.SetString(PREFS_HTML_TOOL_RELATIVE_PATH_KEY, _htmlToolRelativePath);
+                    //_htmlToolRelativePath = ResourceLoader.GetRelativeAssetsOrPackagesPath(_htmlToolPath);
+                    //EditorPrefs.SetString(PREFS_HTML_TOOL_RELATIVE_PATH_KEY, _htmlToolRelativePath);
                 }
             }
 
@@ -349,6 +349,7 @@ namespace Xxhq.Htmltougui.Editor
                     {
                         Debug.LogWarning("请选择有效的路径, 已自动打开默认路径下的工具文件。");
                         _htmlToolPath = path;
+                        EditorPrefs.SetString(PREFS_HTML_TOOL_RELATIVE_PATH_KEY, "");
                         Application.OpenURL(_htmlToolPath);
                     }
                 }
