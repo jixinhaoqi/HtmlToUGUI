@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML 解构工具 · data-u-name 语义命名 v3.9.9</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        :root {
+            --bg: #f0f2f5; --surface: #ffffff; --surface-alt: #f8f9fa;
+            --border: #dde1e6; --text: #2c3e50; --text-secondary: #5a6c7d;
+            --primary: #4f6ef7; --primary-hover: #3b54d4; --primary-light: #eef1fd;
+            --success: #22c55e; --success-bg: #f0fdf6; --error: #ef4444; --error-bg: #fef2f2;
+            --radius: 10px; --radius-sm: 6px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04);
+            --shadow-lg: 0 8px 30px rgba(0,0,0,0.10),0 3px 10px rgba(0,0,0,0.05);
+            --transition: 0.2s cubic-bezier(0.4,0,0.2,1);
+            --font-mono: 'SF Mono','Cascadia Code','Consolas','Monaco','Menlo','Ubuntu Mono',monospace;
+            --font-sans: 'Inter','Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg); color: var(--text);
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            padding: 24px; -webkit-font-smoothing: antialiased;
+        }
+        .app-container {
+            width: 100%; background: var(--surface); border-radius: 16px;
+            box-shadow: var(--shadow-lg); overflow: hidden;
+            display: flex; flex-direction: column; min-height: 85vh; max-height: 95vh;
+        }
+        .app-header {
+            padding: 18px 28px; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 12px;
+            background: var(--surface); flex-shrink: 0; position: relative;
+        }
+        .app-header .logo-icon {
+            width: 38px; height: 38px; border-radius: 10px;
+            background: linear-gradient(135deg, #4f6ef7, #7b5cff);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 18px; font-weight: 700; flex-shrink: 0;
+        }
+        .app-header h1 { font-size: 1.25rem; font-weight: 700; }
+        .app-header .subtitle { font-size: 0.82rem; color: var(--text-secondary); margin-left: 4px; }
+        .version-tag {
+            margin-left: auto; background: var(--primary-light); color: var(--primary);
+            padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;
+            white-space: nowrap; border: 1px solid rgba(79,110,247,0.2);
+        }
+        .main-content { display: flex; flex: 1; min-height: 0; }
+        .panel-left {
+            width: 44%; min-width: 380px; display: flex; flex-direction: column;
+            border-right: 1px solid var(--border); background: var(--surface-alt); flex-shrink: 0;
+        }
+        .panel-section { display: flex; flex-direction: column; flex: 1; min-height: 0; padding: 20px 22px; gap: 10px; }
+        .section-label {
+            display: flex; align-items: center; gap: 8px; font-size: 0.85rem;
+            font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0;
+        }
+        .section-label .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .dot-input { background: #f59e0b; } .dot-output { background: #22c55e; } .dot-preview { background: #4f6ef7; }
+
+        textarea {
+            width: 100%; flex: 1; min-height: 140px; border: 1.5px solid var(--border);
+            border-radius: var(--radius); padding: 14px 16px; font-family: var(--font-mono);
+            font-size: 0.85rem; line-height: 1.55; resize: none; background: var(--surface);
+            color: var(--text); transition: var(--transition); outline: none; tab-size: 2;
+        }
+        textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,110,247,0.08); background: #fefefe; }
+        textarea::placeholder { color: #b0b8c1; }
+        textarea.input-area { min-height: 200px; flex: 2; }
+
+        .hidden-textarea { position: absolute; opacity: 0; pointer-events: none; height: 0; width: 0; }
+
+        .url-loader { display: flex; gap: 8px; flex-shrink: 0; flex-wrap: wrap; }
+        .url-input, .proxy-input {
+            padding: 8px 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+            font-family: var(--font-mono); font-size: 0.85rem; background: var(--surface); color: var(--text);
+            outline: none; transition: var(--transition);
+        }
+        .url-input { flex: 2; min-width: 200px; }
+        .proxy-input { flex: 2; min-width: 200px; }
+        .url-input:focus, .proxy-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,110,247,0.08); }
+        .btn-load, .btn-file {
+            padding: 8px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+            background: var(--surface); font-size: 0.85rem; font-weight: 500; cursor: pointer;
+            white-space: nowrap; transition: var(--transition); color: var(--text-secondary);
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-load:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .btn-file:hover { background: var(--success); color: #fff; border-color: var(--success); }
+        .btn-file input[type="file"] { display: none; }
+
+        .output-code-wrapper {
+            flex: 1; min-height: 160px; border: 1.5px solid var(--border); border-radius: var(--radius);
+            background: #fcfcfd; overflow: auto; box-shadow: var(--shadow-sm);
+            font-family: var(--font-mono); font-size: 0.85rem; line-height: 1.55; tab-size: 2;
+        }
+        .output-code-wrapper pre { margin: 0; padding: 14px 16px; white-space: pre; color: #3b3f4a; background: transparent; }
+        .output-code-wrapper code { font-family: inherit; font-size: inherit; }
+
+        .action-row { display: flex; align-items: center; gap: 14px; flex-shrink: 0; padding: 8px 0 4px 0; flex-wrap: wrap; }
+        .btn-deconstruct {
+            display: inline-flex; align-items: center; gap: 8px; padding: 12px 26px;
+            background: var(--primary); color: #fff; border: none; border-radius: var(--radius-sm);
+            font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: var(--transition);
+            white-space: nowrap; letter-spacing: 0.01em; flex-shrink: 0;
+        }
+        .btn-deconstruct:hover { background: var(--primary-hover); box-shadow: 0 4px 14px rgba(79,110,247,0.3); transform: translateY(-1px); }
+        .btn-deconstruct:disabled { background: #b0b8c1; cursor: not-allowed; box-shadow: none; transform: none; }
+        .btn-deconstruct .btn-icon { font-size: 1.1rem; transition: transform 0.3s ease; }
+        .btn-deconstruct:not(:disabled):hover .btn-icon { transform: rotate(15deg); }
+        .btn-deconstruct.processing .btn-icon { animation: spin 0.7s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .toast {
+            display: flex; align-items: flex-start; gap: 8px; padding: 10px 16px;
+            border-radius: var(--radius-sm); font-size: 0.875rem; font-weight: 500;
+            transition: var(--transition); flex: 1 1 auto; min-width: 0; max-width: 60%;
+            animation: toastIn 0.3s ease; word-break: break-word;
+        }
+        .toast .toast-icon { font-size: 1rem; flex-shrink: 0; margin-top: 2px; }
+        .toast .toast-msg {
+            flex: 1; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;
+        }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(-6px); scale: 0.96; } to { opacity: 1; transform: translateY(0); scale: 1; } }
+        .toast.success { background: var(--success-bg); color: #15803d; border: 1px solid #bbf7d0; }
+        .toast.error { background: var(--error-bg); color: #b91c1c; border: 1px solid #fecaca; }
+        .toast.idle { background: #f8f9fb; color: #8894a0; border: 1px solid #e8ecf1; }
+
+        .panel-right { flex: 1; display: flex; flex-direction: column; min-width: 0; background: var(--surface); }
+        .preview-section { flex: 1.4; display: flex; flex-direction: column; padding: 20px 22px 12px; gap: 10px; min-height: 0; }
+        .preview-container {
+            flex: 1; border: 1.5px solid var(--border); border-radius: var(--radius);
+            overflow: hidden; background: #fff; position: relative; display: flex;
+            align-items: center; justify-content: center; box-shadow: var(--shadow-sm); min-height: 200px;
+        }
+        .preview-container iframe {
+            border: none; display: block; position: absolute; left: 50%; top: 50%;
+            transform-origin: center center; transform: translate(-50%,-50%);
+        }
+        .preview-placeholder {
+            position: absolute; inset: 0; display: flex; align-items: center;
+            justify-content: center; color: #c0c7cf; font-size: 0.9rem;
+            pointer-events: none; z-index: 1; padding: 20px;
+        }
+        .preview-container.has-content .preview-placeholder { display: none; }
+
+        .output-str-section { flex: 1; display: flex; flex-direction: column; padding: 8px 22px 20px; gap: 10px; min-height: 0; }
+        .output-header { display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+        .btn-copy, .btn-download {
+            display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px;
+            border: 1.5px solid var(--border); background: var(--surface); border-radius: var(--radius-sm);
+            font-size: 0.85rem; font-weight: 500; color: var(--text-secondary); cursor: pointer;
+            transition: var(--transition); white-space: nowrap; margin-left: 12px;
+        }
+        .btn-copy:hover:not(:disabled), .btn-download:hover:not(:disabled) { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .btn-copy.copied { background: var(--success); color: #fff; border-color: var(--success); }
+        .btn-copy:disabled, .btn-download:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .stats-bar { display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.75rem; color: var(--text-secondary); flex-shrink: 0; padding: 2px 0; }
+        .stat-item { display: flex; align-items: center; gap: 5px; background: #f8f9fb; padding: 4px 10px; border-radius: 20px; border: 1px solid #eef1f5; }
+        .stat-value { font-weight: 600; color: var(--text); }
+
+        .viewport-controls { display: flex; gap: 12px; align-items: center; margin-left: auto; }
+        .viewport-input {
+            width: 70px; padding: 4px 8px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+            font-family: var(--font-mono); font-size: 0.85rem; text-align: center; background: var(--surface);
+            color: var(--text); outline: none; transition: var(--transition);
+        }
+        .viewport-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,110,247,0.08); }
+        .viewport-sep { color: var(--text-secondary); font-weight: 600; font-size: 0.9rem; user-select: none; }
+
+        .sync-save-row {
+            display: flex; align-items: center; gap: 12px; padding: 4px 0;
+        }
+        .sync-save-row .btn-select-file {
+            padding: 6px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+            background: var(--surface); font-size: 0.85rem; font-weight: 500; cursor: pointer;
+            color: var(--text-secondary); transition: var(--transition);
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .sync-save-row .btn-select-file:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .sync-save-path {
+            font-size: 0.85rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            max-width: 250px;
+        }
+        @media (max-width: 900px) {
+            .main-content { flex-direction: column; }
+            .panel-left { width: 100%; min-width: unset; border-right: none; border-bottom: 1px solid var(--border); max-height: 50%; }
+            .panel-right { max-height: 50%; }
+            .app-container { max-height: none; min-height: 90vh; }
+            textarea.input-area { min-height: 150px; }
+            .output-code-wrapper { min-height: 120px; }
+            .preview-container { min-height: 180px; }
+            .toast { max-width: 100%; }
+        }
+        @media (max-width: 500px) {
+            body { padding: 8px; }
+            .app-header { padding: 12px 16px; }
+            .panel-section { padding: 12px 14px; gap: 6px; }
+            .preview-section { padding: 12px 14px 8px; }
+            .output-str-section { padding: 6px 14px 12px; }
+            .btn-deconstruct { padding: 10px 18px; font-size: 0.85rem; }
+            .url-loader { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <header class="app-header">
+        <div class="logo-icon">&#10233;</div>
+        <h1>HTML 解构工具</h1>
+        <span class="subtitle">data-u-name · 语义命名</span>
+        <span class="version-tag">v3.9.9</span>
+    </header>
+
+    <div class="main-content">
+        <div class="panel-left">
+            <div class="panel-section">
+                <div class="section-label"><span class="dot dot-input"></span> 输入的 HTML 字符串</div>
+                <div class="url-loader">
+                    <input type="text" id="urlInput" class="url-input" placeholder="网络 URL">
+                    <input type="text" id="proxyInput" class="proxy-input" placeholder="自定义 CORS 代理（留空自动尝试）">
+                    <button id="btnLoadUrl" class="btn-load">🌐 加载 URL</button>
+                    <label class="btn-file">
+                        📁 选择本地文件
+                        <input type="file" id="fileInput" accept=".html,.htm,.css,.js" multiple>
+                    </label>
+                </div>
+                <textarea id="inputHtml" class="input-area" placeholder="在此粘贴 HTML 字符串..."></textarea>
+                <div class="action-row">
+                    <button id="btnDeconstruct" class="btn-deconstruct"><span class="btn-icon">⚙</span> 开始解构</button>
+                    <div id="toast" class="toast idle">
+                        <span class="toast-icon">ℹ</span>
+                        <span class="toast-msg">等待输入...</span>
+                    </div>
+                </div>
+                <div class="stats-bar">
+                    <span class="stat-item">元素数: <span class="stat-value" id="statElements">-</span></span>
+                    <span class="stat-item">data-u-name: <span class="stat-value" id="statNamed">-</span></span>
+                    <span class="stat-item">内联资源: <span class="stat-value" id="statInline">-</span></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-right">
+            <div class="preview-section">
+                <div class="section-label" style="justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="dot dot-preview"></span> 输出的 HTML 页面（展示）
+                    </div>
+                    <div class="viewport-controls">
+                        <input type="number" id="previewWidth" class="viewport-input" value="1920" min="1" step="1" title="视口宽度 (px)">
+                        <span class="viewport-sep">×</span>
+                        <input type="number" id="previewHeight" class="viewport-input" value="1080" min="1" step="1" title="视口高度 (px)">
+                    </div>
+                </div>
+                <div class="preview-container" id="previewContainer">
+                    <div class="preview-placeholder" id="previewPlaceholder">🔍 解构后的页面将在此展示</div>
+                    <iframe id="previewFrame" title="HTML预览" loading="lazy"></iframe>
+                </div>
+            </div>
+            <div class="output-str-section">
+                <div class="output-header">
+                    <div class="section-label"><span class="dot dot-output"></span> 输出的 HTML 字符串（格式化）</div>
+                    <div style="display: flex; gap: 8px;">
+                        <button id="btnCopy" class="btn-copy" disabled title="复制带属性的原始 HTML">📋 复制</button>
+                        <button id="btnDownload" class="btn-download" disabled title="下载 HTML 文件">📥 下载</button>
+                    </div>
+                </div>
+                <div class="output-code-wrapper" id="outputCodeWrapper">
+                    <pre><code id="outputHtmlDisplay"></code></pre>
+                </div>
+                <div class="sync-save-row">
+                    <button id="btnSelectFile" class="btn-select-file" title="选择要覆盖的本地 HTML 文件">💾 选择同步文件</button>
+                    <span id="selectedFilePath" class="sync-save-path">未选择</span>
+                </div>
+                <textarea id="outputHtmlRaw" class="hidden-textarea" aria-hidden="true"></textarea>
+            </div>
+            <input type="file" id="syncFileInput" accept=".html,.htm" style="display: none;">
+        </div>
+    </div>
+</div>
+
+<script type="text/template" id="exampleHtml">
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        #headWrapper.s-ps-islite { padding-bottom: 370px; }
+    </style>
+</head>
+<body>
+    <div id="headWrapper" class="s-ps-islite main-content">
+        <h1>复合选择器测试</h1>
+        <span><a href="https://www.baidu.com">关于百度</a></span><span><a href="#">2</a></span>
+        <p>这是一段<span>重要</span>内容。</p>
+    </div>
+</body>
+</html>
+</script>
+
+<script>
+    (() => {
+        const exampleHtml = document.getElementById('exampleHtml')?.textContent || '';
+        const el = id => document.getElementById(id);
+        const inputHtmlEl = el('inputHtml');
+        const outputHtmlDisplay = el('outputHtmlDisplay');
+        const outputHtmlRaw = el('outputHtmlRaw');
+        const btnDeconstruct = el('btnDeconstruct');
+        const btnCopy = el('btnCopy');
+        const btnDownload = el('btnDownload');
+        const toastEl = el('toast');
+        const toastIcon = toastEl.querySelector('.toast-icon');
+        const toastMsg = toastEl.querySelector('.toast-msg');
+        const previewContainer = el('previewContainer');
+        const previewFrame = el('previewFrame');
+        const previewPlaceholder = el('previewPlaceholder');
+        const statElements = el('statElements');
+        const statNamed = el('statNamed');
+        const statInline = el('statInline');
+        const urlInput = el('urlInput');
+        const proxyInput = el('proxyInput');
+        const btnLoadUrl = el('btnLoadUrl');
+        const fileInput = el('fileInput');
+        const previewWidthInput = el('previewWidth');
+        const previewHeightInput = el('previewHeight');
+        const btnSelectFile = el('btnSelectFile');
+        const selectedFilePath = el('selectedFilePath');
+        const syncFileInput = el('syncFileInput');
+
+        let userWidth = 1920, userHeight = 1080;
+        let selectedFileHandle = null;
+
+        function setOutputButtonsEnabled(enabled) {
+            btnCopy.disabled = !enabled;
+            btnDownload.disabled = !enabled;
+        }
+
+        async function writeToFile(handle, content) {
+            if (handle.createWritable) {
+                const writable = await handle.createWritable();
+                await writable.write(content);
+                await writable.close();
+            } else if (handle._file) {
+                const blob = new Blob([content], { type: 'text/html' });
+                saveAs(blob, handle.name || 'deconstructed.html');
+            } else {
+                throw new Error('无法写入文件：句柄无效');
+            }
+        }
+
+        function downloadFile(content, filename = 'deconstructed.html') {
+            const blob = new Blob([content], { type: 'text/html' });
+            saveAs(blob, filename);
+        }
+
+        async function selectSyncFile() {
+            if (window.showOpenFilePicker) {
+                try {
+                    const [fileHandle] = await window.showOpenFilePicker({
+                        types: [{
+                            description: 'HTML files',
+                            accept: { 'text/html': ['.html', '.htm'] }
+                        }],
+                        multiple: false
+                    });
+                    selectedFileHandle = fileHandle;
+                    selectedFilePath.textContent = fileHandle.name;
+                    showToast('success', `已选择文件: ${fileHandle.name}`);
+                } catch (err) {
+                    if (err.name !== 'AbortError') showToast('error', '选择文件失败: ' + err.message);
+                }
+            } else {
+                syncFileInput.click();
+            }
+        }
+
+        syncFileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            selectedFileHandle = { kind: 'file', name: file.name, _file: file };
+            selectedFilePath.textContent = file.name;
+            showToast('success', `已选择文件: ${file.name}`);
+            syncFileInput.value = '';
+        });
+
+        async function saveToSelectedFile(content) {
+            if (!selectedFileHandle) return;
+            try {
+                await writeToFile(selectedFileHandle, content);
+                if (selectedFileHandle.createWritable) {
+                    showToast('success', `已同步保存至: ${selectedFileHandle.name}`);
+                } else {
+                    showToast('success', `因浏览器限制，已触发下载: ${selectedFileHandle.name}`);
+                }
+            } catch (err) {
+                showToast('error', '同步保存失败: ' + err.message);
+            }
+        }
+
+        const toCamelCase = str => {
+            if (!str || typeof str !== 'string') return str;
+            if (/^[a-z][a-zA-Z0-9]*$/.test(str)) return str;
+            const parts = str.split(/[-_]+/);
+            if (parts.length === 1 && str === parts[0]) return /^[A-Z]/.test(str) ? str.charAt(0).toLowerCase() + str.slice(1) : str;
+            let result = parts[0].toLowerCase();
+            for (let i = 1; i < parts.length; i++) if (parts[i].length > 0) result += parts[i].charAt(0).toUpperCase() + parts[i].slice(1).toLowerCase();
+            return result;
+        };
+        const tagPurposeMap = {
+            div: 'container', span: 'span', p: 'paragraph',
+            h1: 'heading', h2: 'heading', h3: 'heading', h4: 'heading', h5: 'heading', h6: 'heading',
+            ul: 'list', ol: 'orderedList', li: 'listItem', a: 'link', img: 'image',
+            table: 'table', thead: 'tableHead', tbody: 'tableBody', tfoot: 'tableFoot', tr: 'tableRow', th: 'tableHeader', td: 'tableCell',
+            form: 'form', input: 'input', button: 'button', select: 'select', textarea: 'textarea', label: 'label',
+            section: 'section', article: 'article', nav: 'navigation', header: 'header', footer: 'footer', main: 'main', aside: 'aside',
+            figure: 'figure', figcaption: 'figcaption', blockquote: 'blockquote', pre: 'pre', code: 'code',
+            em: 'emphasis', strong: 'strong', small: 'small', br: 'break', hr: 'horizontalRule',
+        };
+        const showToast = (type, msg) => {
+            toastEl.className = 'toast ' + type;
+            toastIcon.innerHTML = type==='success'?'✔':(type==='error'?'✖':'ℹ');
+            toastMsg.textContent = msg; toastMsg.title = msg;
+        };
+        const updateStats = (total, namedCount, inline) => {
+            statElements.textContent = total ?? '-'; statNamed.textContent = namedCount ?? '-'; statInline.textContent = inline ?? '-';
+        };
+        const resetStats = () => { statElements.textContent = statNamed.textContent = statInline.textContent = '-'; };
+
+        const formatHTML = html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            let result = '';
+            const doctypeMatch = html.trim().match(/^<!DOCTYPE[^>]*>/i);
+            if (doctypeMatch) result = doctypeMatch[0] + '\n';
+            const voidEls = new Set(['area','base','br','col','embed','hr','img','input','link','meta','param','source','track','wbr']);
+            function process(node, depth) {
+                const indent = '  '.repeat(depth);
+                if (node.nodeType === Node.ELEMENT_NODE) {
+                    const tag = node.tagName.toLowerCase();
+                    const isVoid = voidEls.has(tag);
+                    let openTag = '<' + tag;
+                    for (const attr of node.attributes) openTag += ` ${attr.name}="${attr.value}"`;
+                    if (isVoid) { result += indent + openTag + ' />\n'; return; }
+                    if (tag !== 'script' && tag !== 'style' && node.childNodes.length === 1 && node.childNodes[0].nodeType === Node.TEXT_NODE) {
+                        result += indent + openTag + '>' + node.childNodes[0].textContent + '</' + tag + '>\n'; return;
+                    }
+                    result += indent + openTag + '>\n';
+                    if (tag === 'script' || tag === 'style') { (node.textContent || '').split('\n').forEach(line => result += indent + '  ' + line + '\n'); }
+                    else { for (const child of node.childNodes) process(child, depth + 1); }
+                    result += indent + '</' + tag + '>\n';
+                } else if (node.nodeType === Node.TEXT_NODE) { const text = node.textContent.replace(/\n\s*/g, ' ').trim(); if (text) result += indent + text + '\n'; }
+                else if (node.nodeType === Node.COMMENT_NODE) { result += indent + '<!--' + node.textContent + '-->\n'; }
+            }
+            for (const child of doc.childNodes) { if (child.nodeType !== Node.DOCUMENT_TYPE_NODE) process(child, 0); }
+            return result.trimEnd();
+        };
+        const highlightHTML = html => {
+            const esc = html.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+            return esc
+                .replace(/(&lt;!--[\s\S]*?--&gt;)/g, '<span class="hljs-comment">$1</span>')
+                .replace(/(&lt;\/?)([\w-]+)([\s\S]*?)(\/?&gt;)/g, (m,open,tag,attrs,close) => {
+                    const attrHL = attrs.replace(/([\w-]+)(=)(&quot;)(.*?)(&quot;)/g, '<span class="hljs-attr">$1</span>$2<span class="hljs-string">$3$4$5</span>');
+                    return `<span class="hljs-tag">${open}</span><span class="hljs-tag-name">${tag}</span>${attrHL}<span class="hljs-tag">${close}</span>`;
+                })
+                .replace(/(&lt;style[\s\S]*?&gt;)([\s\S]*?)(&lt;\/style&gt;)/g, (m,o,css,cl)=>o+'<span class="hljs-css">'+css+'</span>'+cl)
+                .replace(/(&lt;script[\s\S]*?&gt;)([\s\S]*?)(&lt;\/script&gt;)/g, (m,o,js,cl)=>o+'<span class="hljs-js">'+js+'</span>'+cl);
+        };
+        document.head.appendChild(Object.assign(document.createElement('style'),{textContent:`
+            .hljs-tag{color:#e06c75}.hljs-tag-name{color:#61afef;font-weight:bold}
+            .hljs-attr{color:#d19a66}.hljs-string{color:#98c379}
+            .hljs-comment{color:#5c6370;font-style:italic}
+            .hljs-css,.hljs-js{color:#abb2bf}
+        `}));
+
+        const defaultProxies = [
+            url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+            url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+        ];
+        const fetchWithTimeout = async (url, timeout = 8000) => {
+            try {
+                const ctrl = new AbortController();
+                const timer = setTimeout(() => ctrl.abort(), timeout);
+                const res = await fetch(url, { signal: ctrl.signal, mode: 'cors' });
+                clearTimeout(timer);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return await res.text();
+            } catch (directErr) {
+                const userProxy = proxyInput.value.trim();
+                if (userProxy) {
+                    try {
+                        const proxyUrl = userProxy.includes('{url}') ? userProxy.replace('{url}', encodeURIComponent(url)) : userProxy + encodeURIComponent(url);
+                        const ctrl = new AbortController();
+                        const timer = setTimeout(() => ctrl.abort(), timeout);
+                        const res = await fetch(proxyUrl, { signal: ctrl.signal });
+                        clearTimeout(timer);
+                        if (!res.ok) throw new Error(`代理返回 HTTP ${res.status}`);
+                        return await res.text();
+                    } catch (e) {}
+                }
+                for (const proxyFn of defaultProxies) {
+                    try {
+                        const proxyUrl = proxyFn(url);
+                        const ctrl = new AbortController();
+                        const timer = setTimeout(() => ctrl.abort(), timeout);
+                        const res = await fetch(proxyUrl, { signal: ctrl.signal });
+                        clearTimeout(timer);
+                        if (!res.ok) throw new Error(`代理返回 HTTP ${res.status}`);
+                        return await res.text();
+                    } catch (e) {}
+                }
+                throw new Error(`请求失败。直接: ${directErr.message}；请检查 URL 或提供有效的 CORS 代理地址。`);
+            }
+        };
+
+        const prependProxyToRelativePaths = (html) => {
+            let base = proxyInput.value.trim();
+            if (!base) {
+                const userUrl = urlInput.value.trim();
+                if (userUrl) {
+                    const lastSlash = userUrl.lastIndexOf('/');
+                    if (lastSlash !== -1) base = userUrl.substring(0, lastSlash + 1);
+                }
+            }
+            if (!base) return html;
+            if (!base.endsWith('/')) base += '/';
+            let result = html;
+            result = result.replace(/<link\s[^>]*?\/?>/gi, (tag) => {
+                if (!/\brel\s*=\s*["']?stylesheet["']?/i.test(tag)) return tag;
+                const hrefMatch = tag.match(/\bhref\s*=\s*["']([^"']+)["']/i) || tag.match(/\bhref\s*=\s*([^\s>]+)/i);
+                if (!hrefMatch) return tag;
+                const href = hrefMatch[1];
+                if (/^(https?:)?\/\//i.test(href)) return tag;
+                const newHref = base + href;
+                return tag.replace(/(\bhref\s*=\s*["'])([^"']+)(["'])/i, '$1' + newHref + '$3');
+            });
+            result = result.replace(/<script\b[^>]*>/gi, (tag) => {
+                const srcMatch = tag.match(/\bsrc\s*=\s*["']([^"']+)["']/i) || tag.match(/\bsrc\s*=\s*([^\s>]+)/i);
+                if (!srcMatch) return tag;
+                const src = srcMatch[1];
+                if (/^(https?:)?\/\//i.test(src)) return tag;
+                const newSrc = base + src;
+                return tag.replace(/(\bsrc\s*=\s*["'])([^"']+)(["'])/i, '$1' + newSrc + '$3');
+            });
+            return result;
+        };
+
+        const loadFromUrl = async (url) => {
+            if (!url.trim()) throw new Error('URL 不能为空');
+            showToast('idle', '正在加载...');
+            let html = await fetchWithTimeout(url);
+            html = prependProxyToRelativePaths(html);
+            showToast('success', '内容已加载');
+            inputHtmlEl.value = html;
+        };
+
+        const inlineLocalResources = (html, fileMap) => {
+            let result = html;
+            result = result.replace(/<link\s[^>]*?\/?>/gi, (tag) => {
+                if (!/\brel\s*=\s*["']?stylesheet["']?/i.test(tag)) return tag;
+                const hrefMatch = tag.match(/\bhref\s*=\s*["']([^"']+)["']/i) || tag.match(/\bhref\s*=\s*([^\s>]+)/i);
+                if (!hrefMatch) return tag;
+                const href = hrefMatch[1];
+                if (/^(https?:)?\/\//i.test(href)) return tag;
+                const basename = href.split('/').pop().split('?')[0];
+                const content = fileMap.get(basename);
+                if (content) return '<style>' + content + '<\/style>';
+                return tag;
+            });
+            result = result.replace(/<script\b[^>]*>/gi, (tag) => {
+                const srcMatch = tag.match(/\bsrc\s*=\s*["']([^"']+)["']/i) || tag.match(/\bsrc\s*=\s*([^\s>]+)/i);
+                if (!srcMatch) return tag;
+                const src = srcMatch[1];
+                if (/^(https?:)?\/\//i.test(src)) return tag;
+                const basename = src.split('/').pop().split('?')[0];
+                const content = fileMap.get(basename);
+                if (content) {
+                    let remainingAttrs = tag.replace(/\bsrc\s*=\s*["'][^"']*["']\s*/i, '').replace(/\bsrc\s*=\s*[^\s>]+\s*/i, '');
+                    remainingAttrs = remainingAttrs.replace(/^\s*<script\s*/i, '').replace(/\s*>\s*$/, '');
+                    return '<script' + (remainingAttrs ? ' ' + remainingAttrs : '') + '>' + content;
+                }
+                return tag;
+            });
+            return result;
+        };
+
+        const loadLocalFiles = async (files) => {
+            if (!files.length) return;
+            showToast('idle', '正在读取本地文件...');
+            const fileMap = new Map();
+            let mainHtmlFile = null;
+            const readTasks = [];
+            for (const file of files) {
+                const name = file.name;
+                const ext = name.split('.').pop().toLowerCase();
+                readTasks.push((async () => {
+                    const text = await file.text();
+                    if (ext === 'html' || ext === 'htm') { mainHtmlFile = { name, text }; fileMap.set(name, text); }
+                    else { fileMap.set(name, text); }
+                })());
+            }
+            await Promise.all(readTasks);
+            if (!mainHtmlFile) { showToast('error', '未找到 HTML 文件，请至少选择一个 .html 文件'); return; }
+            let html = mainHtmlFile.text;
+            html = inlineLocalResources(html, fileMap);
+            inputHtmlEl.value = html;
+            showToast('success', `已加载 ${mainHtmlFile.name}，并自动内联了 ${fileMap.size - 1} 个本地资源`);
+        };
+
+        const collectExternalResources = async (doc) => {
+            const links = [...doc.querySelectorAll('link[rel="stylesheet"][href]')]
+                .filter(l => { const href = l.getAttribute('href'); return href && (href.startsWith('http:') || href.startsWith('https:') || href.startsWith('//')); });
+            const cache = new Map(); let inlineCount = 0; const warnings = [];
+            for (const link of links) {
+                const href = link.getAttribute('href');
+                if (!href || cache.has(href)) continue;
+                try { const content = await fetchWithTimeout(href); cache.set(href, content); inlineCount++; }
+                catch (e) { warnings.push(`CSS ${href}: ${e.message}`); }
+            }
+            return { inlineCount, warnings, cache };
+        };
+
+        const addDataUName = (doc) => {
+            const body = doc.body;
+            if (!body) return { total: 0, namedCount: 0 };
+            const getBaseName = (el) => {
+                if (el.id && el.id.trim()) return toCamelCase(el.id.trim());
+                if (el.hasAttribute('class') && el.getAttribute('class').trim()) return toCamelCase(el.getAttribute('class').trim().split(/\s+/)[0]);
+                const tag = el.tagName.toLowerCase(); return tagPurposeMap[tag] || tag;
+            };
+            const elements = [body, ...body.querySelectorAll('*')].filter(el => el.tagName !== 'STYLE' && el.tagName !== 'SCRIPT');
+            for (const el of elements) {
+                let base = getBaseName(el);
+                const parent = el.parentElement;
+                if (parent) {
+                    const usedNames = new Set();
+                    let sibling = el.previousElementSibling;
+                    while (sibling) { if (sibling.hasAttribute('data-u-name')) usedNames.add(sibling.getAttribute('data-u-name')); sibling = sibling.previousElementSibling; }
+                    if (usedNames.has(base)) { let suffix = 2; while (usedNames.has(base + suffix)) suffix++; base = base + suffix; }
+                }
+                el.setAttribute('data-u-name', base);
+            }
+            return { total: elements.length, namedCount: elements.length };
+        };
+
+        const applyIframeScale = () => {
+            if (!previewFrame.contentDocument?.body) return;
+            const containerW = previewContainer.clientWidth, containerH = previewContainer.clientHeight;
+            if (containerW === 0 || containerH === 0 || userWidth <= 0 || userHeight <= 0) return;
+            const scale = Math.min(containerW / userWidth, containerH / userHeight, 1);
+            previewFrame.style.width = userWidth + 'px';
+            previewFrame.style.height = userHeight + 'px';
+            previewFrame.style.transform = `translate(-50%,-50%) scale(${scale})`;
+        };
+
+        const resetIframe = () => {
+            previewFrame.srcdoc = '';
+            previewFrame.style = '';
+            previewContainer.classList.remove('has-content');
+            previewPlaceholder.style.display = '';
+        };
+
+        const applyViewportFromInputs = () => {
+            let w = parseInt(previewWidthInput.value, 10), h = parseInt(previewHeightInput.value, 10);
+            if (!isNaN(w) && w > 0) userWidth = w; else previewWidthInput.value = userWidth;
+            if (!isNaN(h) && h > 0) userHeight = h; else previewHeightInput.value = userHeight;
+            applyIframeScale();
+        };
+        previewWidthInput.addEventListener('change', applyViewportFromInputs);
+        previewHeightInput.addEventListener('change', applyViewportFromInputs);
+        previewWidthInput.addEventListener('input', applyViewportFromInputs);
+        previewHeightInput.addEventListener('input', applyViewportFromInputs);
+        window.addEventListener('resize', () => { if (previewContainer.classList.contains('has-content')) applyIframeScale(); });
+
+        const decodeHTMLEntities = (str) => { const txt = document.createElement('textarea'); txt.innerHTML = str; return txt.value; };
+
+        const inlineResourcesInHtml = (html, cache) => {
+            let result = html;
+            result = result.replace(/<link\s[^>]*?\/?>/gi, (tag) => {
+                const hasRel = /\brel\s*=\s*["']?stylesheet["']?/i.test(tag);
+                if (!hasRel) return tag;
+                const hrefMatch = tag.match(/\bhref\s*=\s*["']([^"']+)["']/i) || tag.match(/\bhref\s*=\s*([^\s>]+)/i);
+                if (!hrefMatch) return tag;
+                const href = decodeHTMLEntities(hrefMatch[1]);
+                const content = cache.get(href);
+                if (content) return '<style>' + content + '<\/style>';
+                return tag;
+            });
+            return result;
+        };
+
+        const handleDeconstruct = async () => {
+            const input = inputHtmlEl.value;
+            try {
+                const validationDoc = new DOMParser().parseFromString(input, 'text/html');
+                if (validationDoc.querySelectorAll('parsererror').length) throw new Error('HTML 解析错误');
+            } catch (e) { showToast('error', '❌ 输入非法：' + e.message); return; }
+
+            resetStats(); resetIframe(); setOutputButtonsEnabled(false);
+            btnDeconstruct.disabled = true; btnDeconstruct.classList.add('processing');
+            btnDeconstruct.querySelector('.btn-icon').textContent = '⏳';
+            showToast('idle', '正在加载页面...');
+
+            try {
+                previewFrame.srcdoc = input;
+
+                await new Promise((resolve) => {
+                    const timeout = setTimeout(() => {
+                        showToast('error', '❌ ' + 'iframe 加载超时（15秒）');
+                        console.error('iframe 加载超时（15秒）');
+                        resolve();
+                    }, 15000);
+                    previewFrame.onload = () => {
+                        clearTimeout(timeout);
+                        const doc = previewFrame.contentDocument;
+                        if (!doc || !doc.body) {
+                            showToast('error', '❌ 无法访问 iframe 内容（可能由于跨域限制）');
+                            console.error('无法访问 iframe 内容（可能由于跨域限制）');
+                            resolve();
+                            return;
+                        }
+                        resolve();
+                    };
+                    previewFrame.onerror = () => {
+                        clearTimeout(timeout);
+                        showToast('error', '❌ iframe 加载失败');
+                        console.error('iframe 加载失败');
+                        resolve();
+                    };
+                });
+
+                const doc = previewFrame.contentDocument;
+                if (!doc || !doc.body) throw new Error('无法访问 iframe 内容');
+
+                const { inlineCount, warnings, cache } = await collectExternalResources(doc);
+                const { total, namedCount } = addDataUName(doc);
+                updateStats(total, namedCount, inlineCount);
+                if (warnings.length) showToast('error', `内联警告：${warnings.join('；')}`);
+                else showToast('success', '正在计算位置...');
+
+                applyIframeScale();
+                await new Promise(res => requestAnimationFrame(() => requestAnimationFrame(res)));
+
+                const body = doc.body;
+                const iframeBodyRect = body.getBoundingClientRect();
+                const els = [body, ...body.querySelectorAll('*')].filter(el => el.tagName !== 'STYLE' && el.tagName !== 'SCRIPT');
+                for (const el of els) {
+                    try {
+                        const r = el.getBoundingClientRect();
+                        el.setAttribute('data-u-left', Math.round(r.left - iframeBodyRect.left));
+                        el.setAttribute('data-u-top', Math.round(r.top - iframeBodyRect.top));
+                        el.setAttribute('data-u-width', Math.round(r.width));
+                        el.setAttribute('data-u-height', Math.round(r.height));
+                    } catch { el.setAttribute('data-u-left',0); el.setAttribute('data-u-top',0); el.setAttribute('data-u-width',0); el.setAttribute('data-u-height',0); }
+                }
+
+                previewContainer.classList.add('has-content');
+                previewPlaceholder.style.display = 'none';
+
+                const serializer = new XMLSerializer();
+                let finalHtml = serializer.serializeToString(doc);
+                finalHtml = inlineResourcesInHtml(finalHtml, cache);
+
+                outputHtmlRaw.value = finalHtml;
+                const formatted = formatHTML(finalHtml);
+                outputHtmlDisplay.innerHTML = highlightHTML(formatted);
+
+                setOutputButtonsEnabled(true);
+
+                if (selectedFileHandle) await saveToSelectedFile(finalHtml);
+
+                showToast('success', `✅ 完成！${total} 元素，${namedCount} 个 data-u-name`);
+            } catch (err) {
+                resetIframe(); resetStats(); setOutputButtonsEnabled(false);
+                showToast('error', '❌ ' + err.message); console.error(err);
+            } finally {
+                btnDeconstruct.disabled = false; btnDeconstruct.classList.remove('processing');
+                btnDeconstruct.querySelector('.btn-icon').textContent = '⚙';
+            }
+        };
+
+        btnDeconstruct.addEventListener('click', handleDeconstruct);
+
+        btnCopy.addEventListener('click', async () => {
+            const text = outputHtmlRaw.value;
+            if (!text) return;
+            try { await navigator.clipboard.writeText(text); btnCopy.classList.add('copied'); btnCopy.textContent = '✔ 已复制'; setTimeout(() => { btnCopy.classList.remove('copied'); btnCopy.textContent = '📋 复制'; }, 2000); }
+            catch { showToast('error', '复制失败'); }
+        });
+
+        btnDownload.addEventListener('click', () => {
+            const text = outputHtmlRaw.value;
+            if (!text) return;
+            downloadFile(text);
+        });
+
+        btnSelectFile.addEventListener('click', selectSyncFile);
+
+        inputHtmlEl.addEventListener('keydown', e => {
+            if ((e.ctrlKey||e.metaKey) && e.key==='Enter') { e.preventDefault(); if(!btnDeconstruct.disabled) handleDeconstruct(); }
+        });
+        btnLoadUrl.addEventListener('click', () => loadFromUrl(urlInput.value.trim()).catch(e => showToast('error', e.message)));
+        fileInput.addEventListener('change', (e) => loadLocalFiles(e.target.files));
+
+        if (exampleHtml) inputHtmlEl.value = exampleHtml;
+    })();
+</script>
+</body>
+</html>

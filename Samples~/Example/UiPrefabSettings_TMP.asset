@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f585da6201344d4888209207e37818a, type: 3}
+  m_Name: UiPrefabSettings_TMP
+  m_EditorClassIdentifier: Xxhq.Htmltougui.Editor::Xxhq.Htmltougui.Editor.UiPrefabSettings
+  containerPrefab: {fileID: 5094822123815491235, guid: 108b785711f3d51448f9d2244a751d51, type: 3}
+  textPrefab: {fileID: 9064290185938304899, guid: 486902221938d5746bc4ffb6d2287cea, type: 3}
+  buttonPrefab: {fileID: 2746477440734123193, guid: a470bdffa11ec794f9c2066ae1b916ec, type: 3}
+  inputPrefab: {fileID: 8966893856101505354, guid: 9a04eb7b76daf86469c4690daf2f6168, type: 3}
+  togglePrefab: {fileID: 3857490399167921587, guid: 874f35fc0a342194297f845dc3b0ba90, type: 3}
+  sliderPrefab: {fileID: 5266619740494641778, guid: a28c9f505af9de34381d3c2a7f859e6d, type: 3}
+  dropdownPrefab: {fileID: 7075826306568698480, guid: 68285b6c965844545a9a07fedb2e4508, type: 3}
+  scrollViewPrefab: {fileID: 7472781082236964484, guid: 4a5c73247f56262479bf6465743f06f2, type: 3}

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN"><head>
+<meta charset="utf-8" />
+<meta content="width=device-width, initial-scale=1.0, user-scalable=no" name="viewport" />
+<title>template</title>
+<style>* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    width: 100vw;
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background: #f0f0f0;
+}
+@media screen and (max-width: 1920px) {
+    #canvas {
+        transform: scale(calc(100vw / 1920));
+    }
+}
+
+.bg { position: absolute; left: 0px; top: 0px; width: 1920px; height: 1080px; background: url("images/bg-3640cb.png") no-repeat; }
+.shape { position: absolute; left: 42px; top: 43px; width: 553px; height: 531px; background: url("images/shape-ea39b5.png") no-repeat; }
+.img { position: absolute; left: 480px; top: 320px; width: 906px; height: 549px; background: url("images/img-f50693.png") no-repeat; }
+.group {
+  position: absolute;
+  left: 902px;
+  top: 134px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 920px;
+  height: 617px;
+}
+.img-2 { width: 719px; height: 463px; margin-left: 199px; background: url("images/img-2f755a.png") no-repeat; flex-shrink: 0; }
+.row {
+  width: 273px;
+  height: 130px;
+  margin-top: 22px;
+  color: rgba(9, 9, 247, 1);
+  font-size: 110.5px;
+  text-align: left;
+  flex-shrink: 0;
+}
+.strip {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 1920px;
+  height: 1080px;
+  background: url("images/strip-03d587.png") no-repeat;
+  opacity: 0.25;
+}
+.what-a-beautiful-day {
+  position: absolute;
+  left: 50px;
+  top: 586px;
+  width: 506px;
+  height: 59px;
+  color: rgba(255, 255, 255, 1);
+  font-size: 50.15px;
+  text-align: left;
+}
+.text {
+  position: absolute;
+  left: 53px;
+  top: 442px;
+  width: 845px;
+  height: 106px;
+  color: rgba(255, 255, 255, 1);
+  font-size: 90.1px;
+  text-align: left;
+}
+</style>
+</head>
+<body data-u-name="body" data-u-left="0" data-u-top="0" data-u-width="1920" data-u-height="1080">
+<div id="canvas" data-u-name="canvas" data-u-left="0" data-u-top="0" data-u-width="1920" data-u-height="1080">
+<div class="bg layer" data-u-name="bg" data-u-left="0" data-u-top="0" data-u-width="1920" data-u-height="1080">
+</div>
+<div class="shape layer" data-u-name="shape" data-u-left="42" data-u-top="43" data-u-width="553" data-u-height="531">
+</div>
+<div class="img layer" data-u-name="img" data-u-left="480" data-u-top="320" data-u-width="906" data-u-height="549">
+</div>
+<div class="group layer-group v-col" data-u-name="group" data-u-left="902" data-u-top="134" data-u-width="920" data-u-height="617">
+<div class="img-2 layer" data-u-name="img2" data-u-left="1101" data-u-top="134" data-u-width="719" data-u-height="463">
+</div><div class="row layer" data-u-name="row" data-u-left="902" data-u-top="619" data-u-width="273" data-u-height="130">
+<span data-u-name="span" data-u-left="902" data-u-top="619" data-u-width="221" data-u-height="146">换行</span>
+</div></div>
+<div class="strip layer" data-u-name="strip" data-u-left="0" data-u-top="0" data-u-width="1920" data-u-height="1080">
+</div>
+<div class="what-a-beautiful-day layer" data-u-name="whatABeautifulDay" data-u-left="50" data-u-top="586" data-u-width="506" data-u-height="59">
+<span data-u-name="span" data-u-left="50" data-u-top="586" data-u-width="398" data-u-height="132">What a beautiful day.</span>
+</div>
+<div class="text layer" data-u-name="text" data-u-left="53" data-u-top="442" data-u-width="845" data-u-height="106">
+<span data-u-name="span" data-u-left="53" data-u-top="442" data-u-width="544" data-u-height="119">Hello World!</span>
+</div>
+</div>
+<script src="http://localhost:8088/t/main.js"></script>
+
+</body></html>

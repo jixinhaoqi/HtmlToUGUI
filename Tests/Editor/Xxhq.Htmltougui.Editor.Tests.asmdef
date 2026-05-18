@@ -1,0 +1,14 @@
+{
+    "name": "Xxhq.Htmltougui.Editor.Tests",
+    "references": [
+        "Xxhq.Htmltougui.Editor",
+        "Xxhq.Htmltougui"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": []
+}
