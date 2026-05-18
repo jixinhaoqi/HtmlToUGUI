@@ -133,11 +133,6 @@ namespace Xxhq.Htmltougui.Editor
             _layoutCalculatorIndex = EditorPrefs.GetInt(PREFS_LAYOUT_CALCULATOR_INDEX_KEY, 0);
             _isTextOverflow = EditorPrefs.GetBool(PREFS_IS_TEXT_OVERFLOW_KEY, true);
             _htmlToolRelativePath = EditorPrefs.GetString(PREFS_HTML_TOOL_RELATIVE_PATH_KEY, "");
-            //if (EditorPrefs.HasKey(PREFS_HTML_TOOL_RELATIVE_PATH_KEY))
-            //{
-            //    _htmlToolRelativePath = "";
-            //    EditorPrefs.DeleteKey(PREFS_HTML_TOOL_RELATIVE_PATH_KEY);
-            //}
             if(!string.IsNullOrEmpty(_htmlToolRelativePath))
             {
                 _htmlToolPath = Path.Combine(Application.dataPath.Substring(0, Application.dataPath.Length-6), _htmlToolRelativePath).Replace("\\", "/");
@@ -148,8 +143,6 @@ namespace Xxhq.Htmltougui.Editor
                 if (!string.IsNullOrEmpty(path))
                 {
                     _htmlToolPath = path;
-                    //_htmlToolRelativePath = ResourceLoader.GetRelativeAssetsOrPackagesPath(_htmlToolPath);
-                    //EditorPrefs.SetString(PREFS_HTML_TOOL_RELATIVE_PATH_KEY, _htmlToolRelativePath);
                 }
             }
 
@@ -170,7 +163,7 @@ namespace Xxhq.Htmltougui.Editor
             string path = ResourceLoader.GetRegularPath(GetCurrentFilePath());
             if (path.Contains("/Editor/"))
             {
-                if (path.Contains("/Packages/"))
+                if (path.Contains("/Packages/")|| path.Contains("/Library/"))
                 {
                     path = path.Substring(0, path.LastIndexOf("/Editor/")).TrimStart('.').TrimStart('/');
                     if (!Path.IsPathRooted(path))

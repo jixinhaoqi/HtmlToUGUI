@@ -10,35 +10,56 @@ namespace Xxhq.Htmltougui
     /// </summary>
     public static class AssemblyHelper
     {
-        private static List<string> _assemblyNames;
-        private static List<Assembly> _assembly;
-
-        /// <summary>
-        /// 获取要扫描的程序集名称列表。
-        /// </summary>
-        public static List<string> GetAssemblyNames()
+        private static readonly string[] TargetAssemblyNames =
         {
-            if (_assemblyNames == null)
-                _assemblyNames = new List<string>() { "Xxhq.Htmltougui", "Xxhq.Htmltougui.Editor", "Assembly-CSharp" };
-            return _assemblyNames;
-        }
+            "Xxhq.Htmltougui",
+            "Xxhq.Htmltougui.Editor"
+        };
+        private static readonly string AssemblyCSharp = "Assembly-CSharp";
+        private static HashSet<Assembly> _assembly;
+        // 要检测的目标程序集名称（作为被引用方）
+
         /// <summary>
         /// 获取要扫描的已加载程序集列表。
         /// </summary>
-        public static List<Assembly> GetAssemblies()
+        public static HashSet<Assembly> GetAssemblies()
         {
-            if(_assembly == null|| _assembly.Count != GetAssemblyNames().Count)
+            if (_assembly != null)
+                _assembly.Clear();
+            else
+                _assembly = new HashSet<Assembly>();
+
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                if(_assembly != null)
-                    _assembly.Clear();
-                else
-                    _assembly = new List<Assembly>();
-                foreach (var assemblyName in GetAssemblyNames())
+                try
                 {
-                    if(AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(i=>i.GetName().Name == assemblyName) is Assembly assembly)
+                    var referencedAssemblies = assembly.GetReferencedAssemblies();
+                    bool referencesTarget = referencedAssemblies.Any(
+                        refName => TargetAssemblyNames.Contains(refName.Name));
+                    string name = assembly.GetName().Name;
+                    if ((TargetAssemblyNames.Contains(name) || AssemblyCSharp == name) && !_assembly.Contains(assembly))
+                    {
                         _assembly.Add(assembly);
+                    }
+                    else
+                    {
+                        if (referencesTarget)
+                        {
+                            _assembly.Add(assembly);
+                        }
+                        else if (_assembly.Contains(assembly))
+                        {
+                            _assembly.Remove(assembly);
+                        }
+                    }
+
+                }
+                catch
+                {
+                    // 某些动态程序集可能不支持 GetReferencedAssemblies，跳过即可
                 }
             }
+
             return _assembly;
         }
 
@@ -79,14 +100,5 @@ namespace Xxhq.Htmltougui
             return list;
         }
 
-        /// <summary>
-        /// 向扫描列表中添加程序集名称。
-        /// </summary>
-        /// <param name="assemblyName">程序集的名称</param>
-        public static void AddAssemblyName(string assemblyName)
-        {
-            if(!GetAssemblyNames().Contains(assemblyName))
-            _assemblyNames.Add(assemblyName);
-        }
     }
 }
