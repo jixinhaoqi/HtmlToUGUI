@@ -36,7 +36,7 @@
 
 ### 通过 Unity Package Manager 安装
 
-1. 复制 `git clone https://github.com/jixinhaoqi/HtmlToUGUI.git`
+1. 复制 `https://github.com/jixinhaoqi/HtmlToUGUI.git`
 2. 打开 Unity，进入 **Window → Package Manager**
 3. 点击左上角 **+**，选择 **Add package from git URL...**
 4. 粘贴链接，点击 **Add**

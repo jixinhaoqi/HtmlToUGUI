@@ -34,7 +34,7 @@ Select a **SpriteAtlas** or **Sprite(Multiple)** asset, then use **Assets → HT
 
 ### Install via Unity Package Manager
 
-1. Copy `git clone https://github.com/jixinhaoqi/HtmlToUGUI.git`
+1. Copy `https://github.com/jixinhaoqi/HtmlToUGUI.git`
 2. Open Unity, go to **Window → Package Manager**
 3. Click the **+** button in the top-left corner, select **Add package from git URL...**
 
