@@ -52,6 +52,7 @@ Select a **SpriteAtlas** or **Sprite(Multiple)** asset, then use **Assets → HT
 ## HTML Deconstruction Tool
 
 [HTML Deconstruction Tool Tutorial](Tools/HTMLTools/HTML解构工具使用教程.md) — learn about the three usage modes, AI prompt skills, and CORS proxy setup.
+[Online running tool](https://jixinhaoqi.github.io/HtmlToUGUI/)
 
 ## Samples
 
