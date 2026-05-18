@@ -55,7 +55,7 @@ Select a **SpriteAtlas** or **Sprite(Multiple)** asset, then use **Assets → HT
 
 ## Samples
 
-- [Example](Samples/Example/): A simple HTML-to-UGUI demo scene with a complete `index_optimized.html`, sprite atlas, and Canvas output.
+- [Example](Samples~/Example/): A simple HTML-to-UGUI demo scene with a complete `index_optimized.html`, sprite atlas, and Canvas output.
 
 ## Dependencies
 
@@ -86,7 +86,7 @@ A lightweight, purpose-built solution for converting AI-generated or hand-crafte
 > | **Figma** | Plugins like [Figma to HTML](https://www.figma.com/community/plugin/), [Anima](https://www.animaapp.com/), or built-in Dev Mode → CSS/HTML |
 > | **Sketch** | [Anima](https://www.animaapp.com/), Sketch2React, or manual HTML export |
 > | **Adobe XD** | Plugins like Web Export, or [Export Kit](https://exportkit.com/) |
-> | **Photoshop** | Built-in **File → Export → HTML**, or tools like [psd2code](https://psd2code.com/) |
+> | **Photoshop** | Built-in **File → Export → HTML**, or tools like [psd2code](https://github.com/miaowmiaow/psd2code/) |
 > | **AI-Generated** | Large language models output HTML directly, ready for conversion |
 >
 > After obtaining HTML from any of the above, feed it through this tool's conversion pipeline to produce a native UGUI hierarchy.

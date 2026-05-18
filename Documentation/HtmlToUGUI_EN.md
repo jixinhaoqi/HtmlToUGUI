@@ -87,7 +87,7 @@ A lightweight, purpose-built solution for converting AI-generated or hand-crafte
 > | **Figma** | Plugins like [Figma to HTML](https://www.figma.com/community/plugin/), [Anima](https://www.animaapp.com/), or built-in Dev Mode → CSS/HTML |
 > | **Sketch** | [Anima](https://www.animaapp.com/), Sketch2React, or manual HTML export |
 > | **Adobe XD** | Plugins like Web Export, or [Export Kit](https://exportkit.com/) |
-> | **Photoshop** | Built-in **File → Export → HTML**, or tools like [psd2code](https://psd2code.com/) |
+> | **Photoshop** | Built-in **File → Export → HTML**, or tools like [psd2code](https://github.com/miaowmiaow/psd2code) |
 > | **AI-Generated** | Large language models output HTML directly, ready for conversion |
 >
 > After obtaining HTML from any of the above, feed it through this tool's conversion pipeline to produce a native UGUI hierarchy.
@@ -123,4 +123,4 @@ A lightweight, purpose-built solution for converting AI-generated or hand-crafte
 
 | Date | Reason |
 |---|---|
-| May 18, 2026 | Initial release |
+| May 19, 2026 | Initial release |

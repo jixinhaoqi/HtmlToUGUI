@@ -5,7 +5,7 @@
 *   **1920x1080 基准**：根标签必须在 `style` 中明确指定 `position: absolute; width: 1920px; height: 1080px;`。最大绝对不可超过此尺寸。
 
 ## 2. 核心属性规范
-所有标签（，**必须**包含：
+所有标签**必须**包含：
 *   `id="nodeName"`：唯一标识，**必须使用小驼峰命名法（camelCase）**，如 `loginBtn`、`titleTxt`。
 	
 ## 3. style规范（严格遵守）

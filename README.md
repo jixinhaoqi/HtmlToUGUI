@@ -1,4 +1,4 @@
-[(English Documents Available)](README_EN.md)
+[(English Documents)](README_EN.md)
 
 # HTML to UGUI 转换器
 
@@ -48,7 +48,7 @@
 2. 粘贴经过预处理的 HTML 内容，或选择 `.html` 文件
 3. 点击 **开始转换**，在 Canvas 下生成 UGUI 层级
 
-> **提示 — AI 生成 HTML：** 如果不借助「HTML解构工具」预处理，可在生成 HTML 时附加 [AI生成HTML提示词](Tools/HTMLTools/AI生成HTML提示词/) 目录下的 AI 提示词：
+> **提示 — AI 生成 HTML：** 如果不借助「HTML解构工具」预处理，可在生成 HTML 时附加 [AI生成HTML提示词](Tools/HTMLTools/AI生成HTML提示词/) ：
 > - **SKILL_动态定位** — 推荐，输出效果更好
 > - **SKILL_绝对定位** — 若 AI 足够听话，可直接生成绝对定位版本
 
@@ -61,7 +61,7 @@
 
 ## 示例
 
-- [Example](Samples/Example/)：简单的 HTML 转 UGUI 演示场景，包含完整的 `index_optimized.html`、精灵图集和 Canvas 输出。
+- [Example](Samples~/Example/)：简单的 HTML 转 UGUI 演示场景，包含完整的 `index_optimized.html`、精灵图集和 Canvas 输出。
 
 ## 依赖
 
@@ -92,7 +92,7 @@
 > | **Figma** | 插件如 [Figma to HTML](https://www.figma.com/community/plugin/)、[Anima](https://www.animaapp.com/)，或内置 Dev Mode → CSS/HTML |
 > | **Sketch** | [Anima](https://www.animaapp.com/)、Sketch2React，或手动导出 HTML |
 > | **Adobe XD** | 插件如 Web Export，或 [Export Kit](https://exportkit.com/) |
-> | **Photoshop** | 内置 **文件 → 导出 → HTML**，或 [psd2code](https://psd2code.com/) 等工具 |
+> | **Photoshop** | 内置 **文件 → 导出 → HTML**，或 [psd2code](https://github.com/miaowmiaow/psd2code/) 等工具 |
 > | **AI 生成** | 大语言模型直接输出 HTML，即可投入转换 |
 >
 > 从以上任一方式获取 HTML 后，通过本工具的转换管线处理，即可生成原生 UGUI 层级。
