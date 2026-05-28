@@ -1,12 +1,10 @@
-# HTML to UGUI Converter
+# HTML to UGUI 转换器
 
 [(English)](README_EN.md)
 
 [![Unity](https://img.shields.io/badge/Unity-2019.4%2B-black?logo=unity)](https://unity.com/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.md)
 ![Version](https://img.shields.io/badge/version-0.1.0-blue)
-
-# HTML to UGUI 转换器
 
 在 Unity 编辑器中，将 HTML + CSS 内容转换为 UGUI（Canvas）层级结构。
 
