@@ -1,4 +1,10 @@
-[(English Documents)](README_EN.md)
+# HTML to UGUI Converter
+
+[(English)](README_EN.md)
+
+[![Unity](https://img.shields.io/badge/Unity-2019.4%2B-black?logo=unity)](https://unity.com/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.md)
+![Version](https://img.shields.io/badge/version-0.1.0-blue)
 
 # HTML to UGUI 转换器
 

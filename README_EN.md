@@ -1,5 +1,9 @@
 # HTML to UGUI Converter
 
+[![Unity](https://img.shields.io/badge/Unity-2019.4%2B-black?logo=unity)](https://unity.com/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.md)
+![Version](https://img.shields.io/badge/version-0.1.0-blue)
+
 Convert HTML + CSS content into Unity UGUI (Canvas) hierarchies at Editor time.
 
 ## Core Features
