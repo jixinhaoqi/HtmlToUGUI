@@ -26,7 +26,6 @@
 
 - 使用 C# 编码规范，遵循 Unity 包的命名惯例
 - public 类/方法/属性必须添加 XML 文档注释（`/// <summary>`）
-- 提交信息使用英文，格式：`type(scope): description`（如 `feat(css): support nth-child selector`）
 - 不引入新的第三方依赖，除非必要
 - 确保兼容最低的unity版本
 
@@ -61,5 +60,4 @@ We welcome bug reports, feature requests, documentation improvements, and code c
 
 - Follow C# conventions consistent with Unity packages
 - Add XML documentation (`/// <summary>`) on all public APIs
-- Use English for commit messages: `type(scope): description`
 - Avoid adding new third-party dependencies

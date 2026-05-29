@@ -20,7 +20,7 @@
   "samples": [
     {
       "displayName": "Example",
-      "description": "Example scene demonstrating HTML to UGUI conversion with a pre-configured index_optimized.html file, sprite atlas, and UGUI canvas output.",
+      "description": "示例场景演示了预先配置的index_optimized.html文件、精灵图集和UGUI画布输出，将HTML转换为UGUI。\n\nThe example scene demonstrates the output of the pre-configured index_optimized.html file, sprite atlas, and UGUI canvas, converting HTML into UGUI.",
       "interactiveImport": true,
       "path": "Samples~/Example"
     }
