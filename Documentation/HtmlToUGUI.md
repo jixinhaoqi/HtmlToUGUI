@@ -15,7 +15,7 @@
 ## 快速上手
 
 1. 打开转换窗口：**Tools → HTML to UGUI Converter**
-2. （可选）配置 UI 模板：创建 `UiPrefabSettings` 资源（**Assets → Create → HTMLToUGUI → UiPrefabSettings**），为各组件类型指定预制体
+2. （可选）配置 UI 模板：创建 `UiPrefabSettings` 资源（**Assets → Create → Html To UGUI → UiPrefabSettings**），为各组件类型指定预制体
 3. 加载 HTML 内容：
    - 将预处理后的 HTML 粘贴到文本区域；或
    - 点击 **选择 HTML 文件** 加载 `.html` 文件
@@ -37,7 +37,27 @@
 > - **SKILL_动态定位**（推荐，输出效果好）
 > - **SKILL_绝对定位**（若 AI 足够听话，可直接输出可转换的 HTML）
 
+> **效果对比：**
+
+<table>
+  <tr>
+    <td><img src="images/SKILL_动态定位-原网页.png" alt="SKILL_动态定位 - 原网页"></td>
+    <td>→</td>
+    <td><img src="images/SKILL_动态定位-转换后.png" alt="SKILL_动态定位 - 转换后"></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td><img src="images/SKILL_绝对定位-原网页.png" alt="SKILL_绝对定位 - 原网页"></td>
+    <td>→</td>
+    <td><img src="images/SKILL_绝对定位-转换后.png" alt="SKILL_绝对定位 - 转换后"></td>
+  </tr>
+</table>
+
 ![示例编辑器界面](images/Example.jpg)
+
+![其他HTML转换示例](gifs/其他HTML转换示例.gif)
 
 有关 HTML 解构工具的详细使用教程、三种使用方式和 CORS 代理说明，请查看 [HTML解构工具使用教程](../Tools/HTMLTools/HTML解构工具使用教程.md)。
 
@@ -55,7 +75,7 @@
 
 ## SpriteAtlas 工具
 
-在 Project 窗口中选中 **SpriteAtlas** 或 **Sprite(Multiple)** 资源，右键 → **Assets → HTMLToUGUI → 2D**：
+在 Project 窗口中选中 **SpriteAtlas** 或 **Sprite(Multiple)** 资源，右键 → **Assets → Html To UGUI → 2D**：
 
 | 菜单项 | 说明 |
 |---|---|

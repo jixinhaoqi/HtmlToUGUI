@@ -5,9 +5,9 @@ namespace Xxhq.Htmltougui.Editor
 {
     /// <summary>
     /// UI 预制体配置，指定各 HTML 元素类型对应的组件预制体。
-    /// 在 Project 窗口右键 Create → HTMLToUGUI → UiPrefabSettings 创建配置资源。
+    /// 在 Project 窗口右键 Create → Html To UGUI → UiPrefabSettings 创建配置资源。
     /// </summary>
-    [CreateAssetMenu(fileName = "UiPrefabSettings", menuName = "HTMLToUGUI/UiPrefabSettings")]
+    [CreateAssetMenu(fileName = "UiPrefabSettings", menuName = "Html To UGUI/UiPrefabSettings")]
     public class UiPrefabSettings : ScriptableObject
     {
         [LocaleHeader(SystemLanguage.ChineseSimplified, "预制体配置")]

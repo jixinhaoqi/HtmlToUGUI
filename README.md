@@ -8,6 +8,8 @@
 
 在 Unity 编辑器中，将 HTML + CSS 内容转换为 UGUI（Canvas）层级结构。
 
+![简介HTML转换示例](Documentation/gifs/简介HTML转换示例.gif)
+
 ## 核心功能
 
 - **CSS 解析** — 支持 `<style>` 标签、行内样式、复合选择器（类/ID/属性/后代/子代）、伪类（`:hover`/`:active`/`:disabled`）、CSS 变量（`var()`）、相对单位（`em`/`rem`/`%`/`calc()`）
@@ -25,7 +27,7 @@
 
 ## SpriteAtlas 工具
 
-选中 **SpriteAtlas** 或 **Sprite(Multiple)** 资源，通过 **Assets → HTMLToUGUI → 2D** 菜单访问：
+选中 **SpriteAtlas** 或 **Sprite(Multiple)** 资源，通过 **Assets → Html To UGUI → 2D** 菜单访问：
 
 | 菜单项 | 说明 |
 |---|---|
@@ -58,6 +60,23 @@
 > - **SKILL_动态定位** — 推荐，输出效果更好
 > - **SKILL_绝对定位** — 若 AI 足够听话，可直接生成绝对定位版本
 
+> **效果对比：**
+
+<table>
+  <tr>
+    <td><img src="Documentation/images/SKILL_动态定位-原网页.png" alt="SKILL_动态定位 - 原网页"></td>
+    <td>→</td>
+    <td><img src="Documentation/images/SKILL_动态定位-转换后.png" alt="SKILL_动态定位 - 转换后"></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td><img src="Documentation/images/SKILL_绝对定位-原网页.png" alt="SKILL_绝对定位 - 原网页"></td>
+    <td>→</td>
+    <td><img src="Documentation/images/SKILL_绝对定位-转换后.png" alt="SKILL_绝对定位 - 转换后"></td>
+  </tr>
+</table>
 
 ## HTML 解构工具
 

@@ -4,16 +4,21 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [0.2.0] - 2026-06-04
+## [0.2.0] - 2026-06-05
 
 ### Added
 - `calc()` support in relative positioning mode of LayoutCalculator, enabling CSS calc expressions for sizing when `data-u-*` attributes are absent
+- SKILL before/after comparison image tables in README and Documentation
+- Introduction GIF demo in README
+- Additional conversion example GIF in Documentation
 
 ### Changed
 - AI prompt SKILL files simplified and restructured: dynamic positioning adds "no floating text" constraint and removes example request; absolute positioning simplified to 5 core rules
 - HTML deconstruction tool built-in example replaced with a complete login page template
 - README installation instructions rewritten as Git URL method for clarity
 - Documentation: added known limitation regarding floating text
+- Removed "Comparison" sections and MCP/CLI comparison links from all docs
+- Renamed all `HTMLToUGUI` menu paths to `Html To UGUI` in documentation
 
 ### Fixed
 - UguiElementFactory Image color logic: no longer forces white when having a border but no background color

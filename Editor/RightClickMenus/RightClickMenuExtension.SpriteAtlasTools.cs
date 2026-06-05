@@ -15,7 +15,7 @@ namespace Xxhq.Htmltougui.Editor
     public partial class ProjectPanelRightClickExtension
     {
         //确保 SpriteAtlas功能已启用，Editor/ProjectSettings/SpriteAtlas Mode-> Enable
-        [MenuItem("Assets/HTMLToUGUI/2D/SpriteAtlas -> TMP_SpriteAsset", priority = 100)]
+        [MenuItem("Assets/Html To UGUI/2D/SpriteAtlas -> TMP_SpriteAsset", priority = 100)]
         static void SpriteAtlas2TmpSpriteMenu()
         {
             var objs = Selection.objects;
@@ -27,7 +27,7 @@ namespace Xxhq.Htmltougui.Editor
                 }
             }
         }
-        [MenuItem("Assets/HTMLToUGUI/2D/SpriteAtlas -> Sprite(Multiple)", priority = 101)]
+        [MenuItem("Assets/Html To UGUI/2D/SpriteAtlas -> Sprite(Multiple)", priority = 101)]
         static void SpriteAtlas2SpriteSheetMenu()
         {
             var objs = Selection.objects;
@@ -39,7 +39,7 @@ namespace Xxhq.Htmltougui.Editor
                 }
             }
         }
-        [MenuItem("Assets/HTMLToUGUI/2D/SpriteAtlas -> TextureSheet", priority = 102)]
+        [MenuItem("Assets/Html To UGUI/2D/SpriteAtlas -> TextureSheet", priority = 102)]
         static void SpriteAtlas2SpriteGirdSheetMenu()
         {
             var objs = Selection.objects;
@@ -254,7 +254,7 @@ namespace Xxhq.Htmltougui.Editor
         /// <summary>
         /// 导出Multiple类型的Sprite为碎图
         /// </summary>
-        [MenuItem("Assets/HTMLToUGUI/2D/Sprite(Multiple) -> Sprites", priority = 104)]
+        [MenuItem("Assets/Html To UGUI/2D/Sprite(Multiple) -> Sprites", priority = 104)]
         static void ExportSpriteMultiple()
         {
             int selectAssetsCount = Selection.objects.Length;

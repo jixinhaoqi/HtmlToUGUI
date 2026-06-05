@@ -15,7 +15,7 @@ Install the package via the Unity Package Manager:
 ## Getting Started
 
 1. Open the converter window: **Tools → HTML to UGUI Converter**
-2. Configure UI templates (optional): create a `UiPrefabSettings` asset (**Assets → Create → HTMLToUGUI → UiPrefabSettings**) and assign Prefabs for each component type
+2. Configure UI templates (optional): create a `UiPrefabSettings` asset (**Assets → Create → Html To UGUI → UiPrefabSettings**) and assign Prefabs for each component type
 3. Load HTML content:
    - Paste pre-processed HTML into the text area; or
    - Click **Choose HTML File** to load a `.html` file
@@ -37,7 +37,27 @@ The generated hierarchy appears under a `Canvas` object (or reuses an existing o
 > - **SKILL_动态定位** — recommended; produces layout-ready output
 > - **SKILL_绝对定位** — yields absolute-positioned HTML that feeds directly into the converter
 
+> **Comparison:**
+
+<table>
+  <tr>
+    <td><img src="images/SKILL_动态定位-原网页.png" alt="SKILL_动态定位 - Original"></td>
+    <td>→</td>
+    <td><img src="images/SKILL_动态定位-转换后.png" alt="SKILL_动态定位 - Converted"></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td><img src="images/SKILL_绝对定位-原网页.png" alt="SKILL_绝对定位 - Original"></td>
+    <td>→</td>
+    <td><img src="images/SKILL_绝对定位-转换后.png" alt="SKILL_绝对定位 - Converted"></td>
+  </tr>
+</table>
+
 ![Example Editor Window](images/Example.jpg)
+
+![More Conversion Examples](gifs/其他HTML转换示例.gif)
 
 For a detailed guide on the HTML Deconstruction Tool, including usage modes, AI prompt skills, and CORS proxy setup, see the [HTML Deconstruction Tool Tutorial](../Tools/HTMLTools/HTML解构工具使用教程.md).
 
@@ -55,7 +75,7 @@ Smart Calculator's thresholds can be tuned in the converter window under "Layout
 
 ## SpriteAtlas Tools
 
-Select a **SpriteAtlas** or **Sprite(Multiple)** asset in the Project window and right-click → **Assets → HTMLToUGUI → 2D**:
+Select a **SpriteAtlas** or **Sprite(Multiple)** asset in the Project window and right-click → **Assets → Html To UGUI → 2D**:
 
 | Menu Item | Description |
 |---|---|

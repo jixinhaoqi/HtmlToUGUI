@@ -6,6 +6,8 @@
 
 Convert HTML + CSS content into Unity UGUI (Canvas) hierarchies at Editor time.
 
+![Introduction](Documentation/gifs/简介HTML转换示例.gif)
+
 ## Core Features
 
 - **CSS Parsing** — supports `<style>` tags, inline styles, compound selectors (class/ID/attribute/descendant/child), pseudo-classes (`:hover`/`:active`/`:disabled`), CSS variables (`var()`), and relative units (`em`/`rem`/`%`/`calc()`)
@@ -23,7 +25,7 @@ The tool resolves `<img src="...">` references against the HTML file's directory
 
 ## SpriteAtlas Tools
 
-Select a **SpriteAtlas** or **Sprite(Multiple)** asset, then use **Assets → HTMLToUGUI → 2D**:
+Select a **SpriteAtlas** or **Sprite(Multiple)** asset, then use **Assets → Html To UGUI → 2D**:
 
 | Menu Item | Description |
 |---|---|
@@ -56,6 +58,23 @@ Select a **SpriteAtlas** or **Sprite(Multiple)** asset, then use **Assets → HT
 > - **SKILL_动态定位** — recommended, produces responsive layout output
 > - **SKILL_绝对定位** — use if the model reliably follows absolute-positioning instructions
 
+> **Comparison:**
+
+<table>
+  <tr>
+    <td><img src="Documentation/images/SKILL_动态定位-原网页.png" alt="SKILL_动态定位 - Original"></td>
+    <td>→</td>
+    <td><img src="Documentation/images/SKILL_动态定位-转换后.png" alt="SKILL_动态定位 - Converted"></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td><img src="Documentation/images/SKILL_绝对定位-原网页.png" alt="SKILL_绝对定位 - Original"></td>
+    <td>→</td>
+    <td><img src="Documentation/images/SKILL_绝对定位-转换后.png" alt="SKILL_绝对定位 - Converted"></td>
+  </tr>
+</table>
 
 ## HTML Deconstruction Tool
 

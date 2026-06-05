@@ -260,7 +260,7 @@ namespace Xxhq.Htmltougui.Editor
             if (_prefabs == null)
             {
                 EditorGUILayout.HelpBox(
-                    "可以使用自定义预设创建对象，但需要创建并分配 UiPrefabSettings 配置文件(右键 Project 窗口 -> Create -> HTMLToUGUI -> UiPrefabSettings)",
+                    "可以使用自定义预设创建对象，但需要创建并分配 UiPrefabSettings 配置文件(右键 Project 窗口 -> Create -> Html To UGUI -> UiPrefabSettings)",
                     MessageType.Info);
             }
             else
