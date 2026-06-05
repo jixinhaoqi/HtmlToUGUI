@@ -10,7 +10,7 @@ namespace Xxhq.Htmltougui
     [Locale(SystemLanguage.English, "Smart Layout Calculator")]
     public class SmartLayoutCalculator : LayoutCalculator
     {
-        /// <summary> 拉伸百分比阈值，当元素尺寸占比超过该值时使用拉伸锚点 </summary>
+        /// <summary> 中心拉伸百分比阈值，当元素尺寸占比超过该值时使用拉伸锚点 </summary>
         public float StretchPercentThreshold { get; set; } = 0.5f;
         /// <summary> 边界对齐百分比阈值，用于判断元素是否贴边 </summary>
         public float BoundAlignPercentThreshold { get; set; } = 0.1f;

@@ -1,7 +1,7 @@
 {
   "name": "com.xxhq.htmltougui",
   "displayName": "HtmlToUGUI",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "unity": "2019.4",
   "unityRelease": "26f1",
   "description": "\u5c06 HTML + CSS \u5185\u5bb9\u8f6c\u6362\u4e3a Unity UGUI \u5c42\u7ea7\u7ed3\u6784\u3002\u652f\u6301 CSS \u9009\u62e9\u5668\u3001\u4f2a\u7c7b\u3001\u53d8\u91cf\u3001em/rem/%/calc() \u5355\u4f4d\u3001\u4e09\u79cd\u5e03\u5c40\u8ba1\u7b97\u5668\u3001\u53ef\u63d2\u62d4\u6807\u7b7e\u5904\u7406\u5668\u7cfb\u7edf\u548c SpriteAtlas \u8f6c\u6362\u5de5\u5177\u3002\n\nConvert HTML + CSS content into Unity UGUI (Canvas) hierarchies at Editor time. Supports CSS selectors, pseudo-classes, variables, em/rem/%/calc() units, three layout calculators, a pluggable tag-handler system, and SpriteAtlas conversion utilities.",

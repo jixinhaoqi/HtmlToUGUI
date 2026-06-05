@@ -4,7 +4,7 @@
 
 [![Unity](https://img.shields.io/badge/Unity-2019.4%2B-black?logo=unity)](https://unity.com/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.md)
-![Version](https://img.shields.io/badge/version-0.1.0-blue)
+![Version](https://img.shields.io/badge/version-0.2.0-blue)
 
 在 Unity 编辑器中，将 HTML + CSS 内容转换为 UGUI（Canvas）层级结构。
 
@@ -38,15 +38,17 @@
 
 ## 快速开始
 
-### 通过 Unity Package Manager 安装
+### 通过 Git URL安装（推荐）
 
-1. 复制 `https://github.com/jixinhaoqi/HtmlToUGUI.git`
-2. 打开 Unity，进入 **Window → Package Manager**
-3. 点击左上角 **+**，选择 **Add package from git URL...**
-4. 粘贴链接，点击 **Add**
-5. 等待下载导入完成，编译完成后即可使用
+1. 打开 Unity 的 **Package Manager**（Window > Package Manager）
+2. 点击左上角 **+** 按钮，选择 **"Add package from git URL..."**
+3. 输入以下 URL：
+   ```
+   https://github.com/jixinhaoqi/HtmlToUGUI.git
+   ```
+4. 点击 **Add**，等待导入完成
 
-### 通过转换工具使用
+### 使用转换工具
 
 1. 打开 **Tools → HTML to UGUI Converter**
 2. 粘贴经过预处理的 HTML 内容，或选择 `.html` 文件
@@ -74,31 +76,4 @@
 | `com.unity.2d.sprite` | SpriteAtlas 工具 |
 | HtmlAgilityPack | HTML 解析和 DOM 遍历 |
 
-## 竞品对比
-
-本工具是一种轻量级的专用方案，将 AI 生成或手写的 HTML 内容转换为原生 UGUI 层级 — 非常适合快速 UI 原型开发。
-
-| 方案 | 优点 | 缺点 |
-|---|---|---|
-| **HtmlToUGUI** | 完整 CSS 引擎（选择器/伪类/变量/级联）；直接输出 UGUI，运行时零开销；可插拔标签处理器；三种布局计算器；SpriteAtlas 转换工具 | 仅编辑期（无运行时 HTML 渲染）；HTML 输入需经捆绑工具预处理；限于绝对/相对定位 |
-| [UI Toolkit](https://docs.unity3d.com/Manual/UIElements.html)（Unity 官方） | 深度 Unity 集成；USS 支持类 CSS 样式；运行时和编辑器双模式；构建支持 | 输出到自有渲染器（非 UGUI）；USS 是 CSS 子集 — 无 `var()`、伪类有限、布局模型不同；已有 UGUI 项目迁移成本高 |
-| [Vuplex 3D WebView](https://developer.vuplex.com/) | 完整浏览器级 HTML/CSS/JS；可在 3D/UI 中实时渲染网页；跨平台 | 运行时重依赖（内嵌 Chromium）；输出为纹理，非交互式 UGUI；内存/CPU 成本高；需付费授权 |
-| [UniWebView](https://uniwebview.com/) | 移动端原生 WebView 叠加；完整 HTML/CSS/JS；维护良好 | 仅移动端（iOS/Android）；浏览器引擎开销；以叠加层渲染，未集成到 UGUI 层级；需付费授权 |
-
-**HtmlToUGUI 的核心优势**：输出为标准 UGUI 层级，无缝兼容 Unity 输入系统、预制体、射线检测和导航 — 无额外运行时依赖，无构建体积膨胀。
-
-> **提示 — 设计稿转 UGUI 工作流：**
-> 主流设计工具的文件可通过 HTML 中间步骤转换为 UGUI：
->
-> | 工具 | HTML 导出方式 |
-> |---|---|
-> | **Figma** | 插件如 [Figma to HTML](https://www.figma.com/community/plugin/)、[Anima](https://www.animaapp.com/)，或内置 Dev Mode → CSS/HTML |
-> | **Sketch** | [Anima](https://www.animaapp.com/)、Sketch2React，或手动导出 HTML |
-> | **Adobe XD** | 插件如 Web Export，或 [Export Kit](https://exportkit.com/) |
-> | **Photoshop** | 内置 **文件 → 导出 → HTML**，或 [psd2code](https://github.com/miaowmiaow/psd2code/) 等工具 |
-> | **AI 生成** | 大语言模型直接输出 HTML，即可投入转换 |
->
-> 从以上任一方式获取 HTML 后，通过本工具的转换管线处理，即可生成原生 UGUI 层级。
 ---
-
-> [与 Unity MCP/CLI 对比](Compare_MCP_CLI.md) — 了解 HtmlToUGUI 与当前流行的 MCP/CLI AI 工具在编辑器内直接生成 UGUI 的详细对比。

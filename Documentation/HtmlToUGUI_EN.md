@@ -66,32 +66,6 @@ Select a **SpriteAtlas** or **Sprite(Multiple)** asset in the Project window and
 
 The `com.unity.2d.sprite` package must be installed. SpriteAtlas support must be enabled in **Project Settings → SpriteAtlas**.
 
-## Comparison
-
-A lightweight, purpose-built solution for converting AI-generated or hand-crafted HTML into native UGUI hierarchies — ideal for rapid UI prototyping.
-
-| Solution | Pros | Cons |
-|---|---|---|
-| **HtmlToUGUI** | Full CSS engine (selectors, pseudo-classes, variables, cascade); direct UGUI output with zero runtime overhead; pluggable tag handlers; three layout calculators; SpriteAtlas conversion utilities | Editor-time only (no runtime HTML rendering); HTML input requires pre-processing via bundled tool; limited to absolute/relative positioning |
-| [UI Toolkit](https://docs.unity3d.com/Manual/UIElements.html) (Unity official) | Deep Unity integration; USS supports CSS-like styling; runtime and Editor modes; supported for builds | Emits to its own renderer (not UGUI); USS is a subset of CSS — no `var()`, limited pseudo-classes, different layout model; steep migration path for existing UGUI projects |
-| [Vuplex 3D WebView](https://developer.vuplex.com/) | Full browser-grade HTML/CSS/JS; renders live web content in 3D/UI; cross-platform | Heavy runtime dependency (embedded Chromium); outputs to texture, not interactive UGUI; high memory/CPU cost; requires paid license |
-| [UniWebView](https://uniwebview.com/) | Native WebView overlay on mobile; full HTML/CSS/JS; well-maintained | Mobile-only (iOS/Android); browser engine overhead; renders as overlay, not integrated into UGUI hierarchy; requires paid license |
-
-**Key advantage of HtmlToUGUI:** you get a native UGUI hierarchy that works seamlessly with Unity's input system, prefabs, raycasting, and navigation — no extra runtime dependencies, no build bloat.
-
-> **Tip — Design Tool to UGUI Workflow:**
-> Design files from popular tools can be converted to UGUI through an intermediate HTML step:
->
-> | Tool | HTML Export Path |
-> |---|---|
-> | **Figma** | Plugins like [Figma to HTML](https://www.figma.com/community/plugin/), [Anima](https://www.animaapp.com/), or built-in Dev Mode → CSS/HTML |
-> | **Sketch** | [Anima](https://www.animaapp.com/), Sketch2React, or manual HTML export |
-> | **Adobe XD** | Plugins like Web Export, or [Export Kit](https://exportkit.com/) |
-> | **Photoshop** | Built-in **File → Export → HTML**, or tools like [psd2code](https://github.com/miaowmiaow/psd2code) |
-> | **AI-Generated** | Large language models output HTML directly, ready for conversion |
->
-> After obtaining HTML from any of the above, feed it through this tool's conversion pipeline to produce a native UGUI hierarchy.
-
 ## Technical Details
 
 ### Requirements
@@ -108,6 +82,7 @@ A lightweight, purpose-built solution for converting AI-generated or hand-crafte
 - Border-radius is not yet rendered (outline via `Outline` component only)
 - Hyperlink click events on `<a>` tags are not wired up
 - CSS `display: flex` / `grid` layout is not simulated; only absolute and relative positioning are supported
+- Floating text (text nodes not wrapped in a tag, e.g., `<div>floating text<div></div></div>`) is not supported
 
 ### Package Contents
 
@@ -123,4 +98,5 @@ A lightweight, purpose-built solution for converting AI-generated or hand-crafte
 
 | Date | Reason |
 |---|---|
+| Jun 4, 2026 | Updated with floating text limitation; removed Comparison section |
 | May 19, 2026 | Initial release |

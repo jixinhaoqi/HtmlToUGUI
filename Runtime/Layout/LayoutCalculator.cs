@@ -105,6 +105,10 @@ namespace Xxhq.Htmltougui
             string parentHeight = parentRt ? parentRt.rect.height.ToString() : "100%";
             string width = styles.TryGetValue("width", out string w) ? w : parentWidth;
             string height = styles.TryGetValue("height", out string h) ? h : parentHeight;
+            if(width.Contains("calc"))
+                width = UnitParser.Parse(width, UnitParser.Parse(parentWidth)).ToString();
+            if (height.Contains("calc"))
+                height = UnitParser.Parse(height, UnitParser.Parse(parentHeight)).ToString();
             rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, UnitParser.Parse(width));
             rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, UnitParser.Parse(height));
             // transform: translate

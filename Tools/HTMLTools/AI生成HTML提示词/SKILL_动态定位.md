@@ -7,6 +7,4 @@ body以及body以内的所有标签，**必须**包含：
 *   `data-u-height="...px"`：通过`getBoundingClientRect().height`获取。
 
 ## 2. 限制（严格遵守）
-禁止添加<link>和<script>标签。
-
-按照上述规则生成一个登录页面
+*   禁止添加<link>和<script>标签，禁止添加`游离的文本`。

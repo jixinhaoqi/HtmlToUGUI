@@ -286,23 +286,148 @@
 </div>
 
 <script type="text/template" id="exampleHtml">
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        #headWrapper.s-ps-islite { padding-bottom: 370px; }
-    </style>
-</head>
-<body>
-    <div id="headWrapper" class="s-ps-islite main-content">
-        <h1>复合选择器测试</h1>
-        <span><a href="https://www.baidu.com">关于百度</a></span><span><a href="#">2</a></span>
-        <p>这是一段<span>重要</span>内容。</p>
-    </div>
-</body>
-</html>
+	  <!DOCTYPE html>
+	  <html lang="zh-CN">
+		<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>用户登录</title>
+		<style>
+			* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+			}
+		
+			body {
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			min-height: 100vh;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 20px;
+			}
+		
+			.login-card {
+			background: white;
+			border-radius: 20px;
+			box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+			padding: 40px 35px;
+			width: 100%;
+			max-width: 400px;
+			}
+		
+			.login-card h2 {
+			text-align: center;
+			margin-bottom: 30px;
+			color: #333;
+			font-size: 28px;
+			font-weight: 500;
+			}
+		
+			.input-group {
+			margin-bottom: 20px;
+			}
+		
+			.input-group label {
+			display: block;
+			margin-bottom: 8px;
+			color: #555;
+			font-size: 14px;
+			font-weight: 500;
+			}
+		
+			.input-group input {
+			width: 100%;
+			padding: 14px 16px;
+			border: 2px solid #e0e0e0;
+			border-radius: 10px;
+			font-size: 15px;
+			transition: border-color 0.3s;
+			outline: none;
+			}
+		
+			.input-group input:focus {
+			border-color: #667eea;
+			}
+		
+			.remember-group {
+			display: flex;
+			align-items: center;
+			margin-bottom: 25px;
+			font-size: 14px;
+			color: #555;
+			}
+		
+			.remember-group input[type="checkbox"] {
+			margin-right: 8px;
+			width: 16px;
+			height: 16px;
+			accent-color: #667eea;
+			}
+		
+			.login-btn {
+			width: 100%;
+			padding: 14px;
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			border: none;
+			border-radius: 10px;
+			color: white;
+			font-size: 16px;
+			font-weight: 600;
+			cursor: pointer;
+			transition: opacity 0.3s;
+			}
+		
+			.login-btn:hover {
+			opacity: 0.9;
+			}
+		
+			.extra-links {
+			text-align: center;
+			margin-top: 20px;
+			font-size: 14px;
+			color: #777;
+			}
+		
+			.extra-links a {
+			color: #667eea;
+			text-decoration: none;
+			margin: 0 5px;
+			}
+		
+			.extra-links a:hover {
+			text-decoration: underline;
+			}
+		</style>
+		</head>
+		<body>
+		<div class="login-card">
+			<h2>欢迎回来</h2>
+			<form action="#" method="post">
+			<div class="input-group">
+				<label for="username">用户名</label>
+				<input type="text" id="username" name="username" placeholder="请输入用户名" required>
+			</div>
+			<div class="input-group">
+				<label for="password">密码</label>
+				<input type="password" id="password" name="password" placeholder="请输入密码" required>
+			</div>
+			<div class="remember-group">
+				<input type="checkbox" id="remember" name="remember">
+				<label for="remember">记住我</label>
+			</div>
+			<button type="submit" class="login-btn">登 录</button>
+			</form>
+			<div class="extra-links">
+			<a href="#">忘记密码？</a>
+			<span>|</span>
+			<a href="#">注册新账号</a>
+			</div>
+		</div>
+		</body>
+	  </html>
 </script>
 
 <script>

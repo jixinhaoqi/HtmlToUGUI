@@ -66,32 +66,6 @@
 
 需要安装 `com.unity.2d.sprite` 包。**Project Settings → SpriteAtlas** 中必须启用 SpriteAtlas 功能。
 
-## 竞品对比
-
-本工具是一种轻量级的专用方案，将 AI 生成或手写的 HTML 内容转换为原生 UGUI 层级 — 非常适合快速 UI 原型开发。
-
-| 方案 | 优点 | 缺点 |
-|---|---|---|
-| **HtmlToUGUI** | 完整 CSS 引擎（选择器/伪类/变量/级联）；直接输出 UGUI，运行时零开销；可插拔标签处理器；三种布局计算器；SpriteAtlas 转换工具 | 仅编辑期（无运行时 HTML 渲染）；HTML 输入需经捆绑工具预处理；限于绝对/相对定位 |
-| [UI Toolkit](https://docs.unity3d.com/Manual/UIElements.html)（Unity 官方） | 深度 Unity 集成；USS 支持类 CSS 样式；运行时和编辑器双模式；构建支持 | 输出到自有渲染器（非 UGUI）；USS 是 CSS 子集 — 无 `var()`、伪类有限、布局模型不同；已有 UGUI 项目迁移成本高 |
-| [Vuplex 3D WebView](https://developer.vuplex.com/) | 完整浏览器级 HTML/CSS/JS；可在 3D/UI 中实时渲染网页；跨平台 | 运行时重依赖（内嵌 Chromium）；输出为纹理，非交互式 UGUI；内存/CPU 成本高；需付费授权 |
-| [UniWebView](https://uniwebview.com/) | 移动端原生 WebView 叠加；完整 HTML/CSS/JS；维护良好 | 仅移动端（iOS/Android）；浏览器引擎开销；以叠加层渲染，未集成到 UGUI 层级；需付费授权 |
-
-**HtmlToUGUI 的核心优势**：输出为标准 UGUI 层级，无缝兼容 Unity 输入系统、预制体、射线检测和导航 — 无额外运行时依赖，无构建体积膨胀。
-
-> **提示 — 设计稿转 UGUI 工作流：**
-> 主流设计工具的文件可通过 HTML 中间步骤转换为 UGUI：
->
-> | 工具 | HTML 导出方式 |
-> |---|---|
-> | **Figma** | 插件如 [Figma to HTML](https://www.figma.com/community/plugin/)、[Anima](https://www.animaapp.com/)，或内置 Dev Mode → CSS/HTML |
-> | **Sketch** | [Anima](https://www.animaapp.com/)、Sketch2React，或手动导出 HTML |
-> | **Adobe XD** | 插件如 Web Export，或 [Export Kit](https://exportkit.com/) |
-> | **Photoshop** | 内置 **文件 → 导出 → HTML**，或 [psd2code](https://github.com/miaowmiaow/psd2code/) 等工具 |
-> | **AI 生成** | 大语言模型直接输出 HTML，即可投入转换 |
->
-> 从以上任一方式获取 HTML 后，通过本工具的转换管线处理，即可生成原生 UGUI 层级。
-
 ## 技术细节
 
 ### 环境要求
@@ -108,6 +82,7 @@
 - 圆角（border-radius）尚未渲染，仅通过 `Outline` 组件实现简单边框
 - `<a>` 标签的超链接点击事件尚未接入
 - CSS `display: flex` / `grid` 布局未模拟，仅支持绝对定位和相对定位
+- 不支持HTML游离的文本，如`<div>游离的文本<div></div></div>`
 
 ### 包内容
 
@@ -123,4 +98,5 @@
 
 | 日期 | 说明 |
 |---|---|
+| 2026-06-04 | 增加游离文本已知限制，移除竞品对比章节 |
 | 2026-05-19 | 初始发布 |

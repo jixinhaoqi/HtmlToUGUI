@@ -99,7 +99,7 @@ namespace Xxhq.Htmltougui.Editor
             if (haveBg)
             {
                 var img = go.GetComponent<Image>()?? go.AddComponent<Image>();
-                img.color = haveColor ? color : haveAllBorder || haveUrl ? Color.white : Color.clear;
+                img.color = haveColor ? color : haveUrl ? Color.white : Color.clear;
                 VisualStyleApplier.ApplyCommonStyles(go, styles, _pseudoClassStyles, _htmlFilePath);
                 NodeHelper.CreateInterTextIfHas(node, styles, go.transform, CreateText);
             }

@@ -19,7 +19,7 @@ namespace Xxhq.Htmltougui.Editor
 
         public override void OnGUI()
         {
-            StretchPercentThreshold = EditorGUILayout.Slider("      拉伸百分比阈值", StretchPercentThreshold, 0f, 1f);
+            StretchPercentThreshold = EditorGUILayout.Slider("      中心对齐拉伸百分比阈值", StretchPercentThreshold, 0f, 1f);
             float min = AxisAlignPercentThresholdRange.x;
             float max = AxisAlignPercentThresholdRange.y;
             EditorGUI.BeginChangeCheck();

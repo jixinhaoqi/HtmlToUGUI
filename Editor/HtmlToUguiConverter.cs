@@ -17,7 +17,6 @@ namespace Xxhq.Htmltougui.Editor
     /// </summary>
     public class HtmlToUguiConverter : EditorWindow
     {
-        // ========== 公共配置属性 ==========
         public UiPrefabSettings Prefabs => _prefabs;
         private UiPrefabSettings _prefabs;
         private SerializedProperty _containerPrefabProp;
@@ -30,6 +29,7 @@ namespace Xxhq.Htmltougui.Editor
         private SerializedProperty _scrollViewPrefabProp;
         public string HtmlFilePath { get => _htmlFilePath; set => _htmlFilePath = value; }
         private string _htmlFilePath = "";
+        private string _htmlToolPath = "";
 
         public bool IsEnableWatcherHtml { get => _isEnableWatcherHtml; set => _isEnableWatcherHtml = value; }
         private bool _isEnableWatcherHtml;
@@ -50,8 +50,6 @@ namespace Xxhq.Htmltougui.Editor
         public bool IsTextOverflow { get => _isTextOverflow; set => _isTextOverflow = value; }
         private bool _isTextOverflow = true;
 
-        private string _htmlToolPath = "";
-        private string _htmlToolRelativePath = "";
 
         // CSS 继承样式属性（公开供外部访问）
         /// <summary> CSS 可继承样式属性集合 </summary>
@@ -65,13 +63,14 @@ namespace Xxhq.Htmltougui.Editor
             "quotes","opacity"
         };
 
+        private string[] _toolToolbarNames= new string[] { "HTML解构工具", "AI生成HTML提示词" };
+        private int _toolToolbarIndex = 0;
         // 标签处理器注册表
         private Dictionary<string, ITagHandler> _tagHandlers;
 
         public string HtmlContent { get => _htmlContent; set => _htmlContent = value; }
         private string _htmlContent = "";
 
-        // ========== 内部状态 ==========
         private Vector2 _scrollPosition;
         private Vector2 _textAreaScrollPosition;
         private SerializedObject _so;
@@ -93,14 +92,13 @@ namespace Xxhq.Htmltougui.Editor
         private const string PREFS_IS_LEGACY_TEXT_KEY = "HtmlToUguiConverter_IsLegacyText";
         private const string PREFS_LAYOUT_CALCULATOR_INDEX_KEY = "HtmlToUguiConverter_LayoutCalculatorIndex";
         private const string PREFS_IS_TEXT_OVERFLOW_KEY = "HtmlToUguiConverter_IsTextOverflow";
-        private const string PREFS_HTML_TOOL_RELATIVE_PATH_KEY = "HtmlToUguiConverter_HtmlToolRelativePath";
+        private const string PREFS_TOOL_TOOLBAR_INDEX_KEY = "HtmlToUguiConverter_ToolToolbarIndex";
 
-        // ========== 菜单入口与生命周期 ==========
         [MenuItem("Tools/HTML to UGUI Converter")]
         public static void ShowWindow() 
         {
             HtmlToUguiConverter window = GetWindow<HtmlToUguiConverter>("HTML 转 UGUI");
-            window.minSize = new Vector2(650, 600);
+            //window.minSize = new Vector2(650, 600);
         }
 
         private void OnDisable()
@@ -113,6 +111,7 @@ namespace Xxhq.Htmltougui.Editor
             EditorPrefs.SetBool(PREFS_IS_LEGACY_TEXT_KEY, _isLegacyText);
             EditorPrefs.SetInt(PREFS_LAYOUT_CALCULATOR_INDEX_KEY, _layoutCalculatorIndex);
             EditorPrefs.SetBool(PREFS_IS_TEXT_OVERFLOW_KEY, _isTextOverflow);
+            EditorPrefs.SetInt(PREFS_TOOL_TOOLBAR_INDEX_KEY, _toolToolbarIndex);
             if(_layoutCalculatorTypes != null)
                 foreach(var v in _layoutCalculatorTypes)
                     v.OnDisable();
@@ -132,18 +131,12 @@ namespace Xxhq.Htmltougui.Editor
             _isLegacyText = EditorPrefs.GetBool(PREFS_IS_LEGACY_TEXT_KEY, false);
             _layoutCalculatorIndex = EditorPrefs.GetInt(PREFS_LAYOUT_CALCULATOR_INDEX_KEY, 0);
             _isTextOverflow = EditorPrefs.GetBool(PREFS_IS_TEXT_OVERFLOW_KEY, true);
-            _htmlToolRelativePath = EditorPrefs.GetString(PREFS_HTML_TOOL_RELATIVE_PATH_KEY, "");
-            if(!string.IsNullOrEmpty(_htmlToolRelativePath))
+            _toolToolbarIndex = EditorPrefs.GetInt(PREFS_TOOL_TOOLBAR_INDEX_KEY, 0);
+
+            string path = GetPackagesFullPath("Tools/HtmlTools/HTML解构工具.html");
+            if (File.Exists(path))
             {
-                _htmlToolPath = Path.Combine(Application.dataPath.Substring(0, Application.dataPath.Length-6), _htmlToolRelativePath).Replace("\\", "/");
-            }
-            else
-            {
-                string path = GetDefaultFilePath();
-                if (!string.IsNullOrEmpty(path))
-                {
-                    _htmlToolPath = path;
-                }
+                _htmlToolPath = path;
             }
 
             if (!string.IsNullOrEmpty(uiPrefabSettingsPath))
@@ -158,12 +151,13 @@ namespace Xxhq.Htmltougui.Editor
             DiscoverScripts();
         }
 
-        private string GetDefaultFilePath()
+
+        private string GetPackagesFullPath(string relativePath)
         {
             string path = ResourceLoader.GetRegularPath(GetCurrentFilePath());
             if (path.Contains("/Editor/"))
             {
-                if (path.Contains("/Packages/")|| path.Contains("/Library/"))
+                if (path.Contains("/Packages/") || path.Contains("/Library/"))
                 {
                     path = path.Substring(0, path.LastIndexOf("/Editor/")).TrimStart('.').TrimStart('/');
                     if (!Path.IsPathRooted(path))
@@ -174,11 +168,8 @@ namespace Xxhq.Htmltougui.Editor
                 }
                 else
                     path = path.Substring(0, path.LastIndexOf("/Editor/"));
-                path = path + "/Tools/HtmlTools/HTML解构工具.html";
-                if (File.Exists(path))
-                {
-                    return path;
-                }
+                path = path + "/" + relativePath;
+                return path;
             }
             return "";
         }
@@ -234,7 +225,7 @@ namespace Xxhq.Htmltougui.Editor
         // ========== UI 绘制 ==========
         private void OnGUI()
         {
-            GUILayout.Label("选择 HTML 文件并转换为 UGUI 结构", EditorStyles.boldLabel);
+            GUILayout.Label("将 HTML 内容转换为 UGUI 结构", EditorStyles.boldLabel);
             EditorGUILayout.Space(10);
             _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition);
             {
@@ -309,49 +300,65 @@ namespace Xxhq.Htmltougui.Editor
 
         private void DrawExternalToolchainUI()
         {
-            GUILayout.Label("2. HTML解构工具", EditorStyles.boldLabel);
-            GUILayout.BeginHorizontal();
-
-            if (GUILayout.Button("浏览...", GUILayout.ExpandWidth(false)))
+            GUILayout.Label("2. 预处理", EditorStyles.boldLabel);
+            _toolToolbarIndex = GUILayout.Toolbar(_toolToolbarIndex, _toolToolbarNames);
+            if (_toolToolbarIndex == 0)
             {
-                _htmlToolPath = EditorUtility.OpenFilePanel("选择 HTML 解构工具", "", "html");
-                if (!string.IsNullOrEmpty(_htmlToolPath))
+                GUILayout.BeginHorizontal();
                 {
-                    if (_htmlToolPath.Contains("/Assets/") || _htmlToolPath.Contains("/Packages/"))
+                    if (GUILayout.Button("在浏览器中打开", GUILayout.ExpandWidth(false)))
                     {
-                        _htmlToolRelativePath = ResourceLoader.GetRelativeAssetsOrPackagesPath(_htmlToolPath);
+                        if (string.IsNullOrWhiteSpace(_htmlToolPath) || !File.Exists(_htmlToolPath))
+                        {
+                            string path = GetPackagesFullPath("Tools/HtmlTools/HTML解构工具.html");
+                            if (!File.Exists(path))
+                                Debug.LogError("路径无效。");
+                            else
+                            {
+                                Debug.Log("已在浏览器中打开。");
+                                _htmlToolPath = path;
+                                Application.OpenURL(_htmlToolPath);
+                            }
+                        }
+                        else
+                            Application.OpenURL(_htmlToolPath);
                     }
-                    else
-                    {
-                        Debug.LogWarning("选择的文件不在 Assets 或 Packages 目录下，无法保存路径。");
-                    }
-                    if (!string.IsNullOrEmpty(_htmlToolRelativePath))
-                        EditorPrefs.SetString(PREFS_HTML_TOOL_RELATIVE_PATH_KEY, _htmlToolRelativePath);
-                    GUI.FocusControl(null);
+                    EditorGUILayout.SelectableLabel(_htmlToolPath, GUILayout.Height(20));
+                    GUILayout.EndHorizontal();
                 }
             }
-
-            if (GUILayout.Button("在浏览器中打开", GUILayout.ExpandWidth(false)))
+            else 
             {
-                if (string.IsNullOrWhiteSpace(_htmlToolPath) || !File.Exists(_htmlToolPath))
+                GUILayout.BeginHorizontal();
                 {
-                    string path = GetDefaultFilePath();
-                    if(string.IsNullOrEmpty(path))
-                        Debug.LogError("路径无效。");
-                    else
+                    GUILayout.Label("复制内容到剪切板：");
+                    if (GUILayout.Button("SKILL_动态定位", GUILayout.ExpandWidth(false)))
                     {
-                        Debug.LogWarning("请选择有效的路径, 已自动打开默认路径下的工具文件。");
-                        _htmlToolPath = path;
-                        EditorPrefs.SetString(PREFS_HTML_TOOL_RELATIVE_PATH_KEY, "");
-                        Application.OpenURL(_htmlToolPath);
+                        string path = GetPackagesFullPath("Tools/HtmlTools/AI生成HTML提示词/SKILL_动态定位.md");
+                        if (!File.Exists(path))
+                            Debug.LogError("路径无效。");
+                        else
+                        {
+                            Debug.Log("已复制到剪切板。");
+                            string content = File.ReadAllText(path);
+                            GUIUtility.systemCopyBuffer = content;
+                        }
                     }
+                    if (GUILayout.Button("SKILL_绝对定位", GUILayout.ExpandWidth(false)))
+                    {
+                        string path = GetPackagesFullPath("Tools/HtmlTools/AI生成HTML提示词/SKILL_绝对定位.md");
+                        if (!File.Exists(path))
+                            Debug.LogError("路径无效。");
+                        else
+                        {
+                            Debug.Log("已复制到剪切板。");
+                            string content = File.ReadAllText(path);
+                            GUIUtility.systemCopyBuffer = content;
+                        }
+                    }
+                    GUILayout.EndHorizontal();
                 }
-                else
-                    Application.OpenURL(_htmlToolPath);
             }
-            EditorGUILayout.SelectableLabel(_htmlToolPath, GUILayout.Height(20));
-            //GUILayout.Label(_htmlToolPath);
-            GUILayout.EndHorizontal();
             GUILayout.Space(10);
         }
 
@@ -361,8 +368,6 @@ namespace Xxhq.Htmltougui.Editor
             GUILayout.Label("3. 转换设置", EditorStyles.boldLabel);
             EditorGUILayout.BeginHorizontal();
             {
-                GUILayout.Label("HTML 文件路径:", GUILayout.ExpandWidth(false));
-                _htmlFilePath = GUILayout.TextField(_htmlFilePath, GUILayout.MinWidth(0));
                 if (GUILayout.Button("选择 HTML 文件", GUILayout.ExpandWidth(false)))
                 {
                     _htmlFilePath = EditorUtility.OpenFilePanel("选择 HTML", "", "html");
@@ -375,6 +380,8 @@ namespace Xxhq.Htmltougui.Editor
                             ConvertHtmlToUgui();
                     }
                 }
+                EditorGUILayout.SelectableLabel(_htmlFilePath, GUILayout.Height(20));
+
                 _isAutoToUGui = GUILayout.Toggle(_isAutoToUGui, "自动转换", GUILayout.ExpandWidth(false));
 
                 EditorGUI.BeginChangeCheck();
@@ -393,8 +400,8 @@ namespace Xxhq.Htmltougui.Editor
                 }
                 EditorGUILayout.EndHorizontal();
             }
-            EditorGUILayout.HelpBox($"将 【HTML解构工具】 处理后的字符串粘贴到下方 【HTML内容】 输入框内，或者通过 【选择HTML文件】 载入", MessageType.Info);
-            EditorGUILayout.HelpBox($"【HTML内容】 输入框的内容必须包含 【HTML解构工具】 处理后的字符串，或者所有标签都有 【绝对定位的样式】 (left、top、width、height)，才能正确处理标签布局", MessageType.Warning);
+            EditorGUILayout.HelpBox($"将 【预处理】 处理后的字符串粘贴到下方 【HTML内容】 输入框内，或者通过 【选择HTML文件】 载入", MessageType.Info);
+            EditorGUILayout.HelpBox($"【HTML内容】 输入框的内容必须包含 【预处理】 处理后的字符串，或者所有标签都有 【绝对定位的样式】 (left、top、width、height)，才能正确处理标签布局", MessageType.Warning);
             _isShowHtmlEditor = EditorGUILayout.Foldout(_isShowHtmlEditor, $"HTML 内容 ({(_htmlContent.Length):N0} 字符)");
 
             _textAreaScrollPosition = EditorGUILayout.BeginScrollView(_textAreaScrollPosition, GUILayout.Height(100));
@@ -426,7 +433,7 @@ namespace Xxhq.Htmltougui.Editor
             if (_layoutCalculatorTypes?.Length > 0&& _layoutCalculatorIndex < _layoutCalculatorTypes.Length)
                 _layoutCalculatorTypes[_layoutCalculatorIndex].OnGUI();
             _isLegacyText = GUILayout.Toggle(_isLegacyText, "使用旧版 Text 组件");
-            _isTextOverflow = GUILayout.Toggle(_isTextOverflow, "文本溢出（如果文字超出区域无法显示，建议开启）");
+            _isTextOverflow = GUILayout.Toggle(_isTextOverflow, "文本溢出（如果文字超出无法正常显示，建议开启）");
             GUILayout.Space(10);
         }
 
@@ -469,8 +476,7 @@ namespace Xxhq.Htmltougui.Editor
             }
             int safeIndex = Mathf.Clamp(_layoutCalculatorIndex, 0, _layoutCalculatorTypes.Length - 1);
             _cssParser = new CssParser();
-            _layoutCalculator = (LayoutCalculator)Activator.CreateInstance(
-                _layoutCalculatorTypes[safeIndex].GetType());
+            _layoutCalculator = _layoutCalculatorTypes[safeIndex];
             _elementFactory = new UguiElementFactory(_prefabs, _isLegacyText, _htmlFilePath, _cssParser.CurrentPseudoClassStyles, _isTextOverflow);
         }
 
