@@ -4,7 +4,7 @@
 
 [![Unity](https://img.shields.io/badge/Unity-2019.4%2B-black?logo=unity)](https://unity.com/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.md)
-![Version](https://img.shields.io/badge/version-0.2.0-blue)
+![Version](https://img.shields.io/badge/version-0.3.0-blue)
 
 在 Unity 编辑器中，将 HTML + CSS 内容转换为 UGUI（Canvas）层级结构。
 
@@ -14,7 +14,7 @@
 
 - **CSS 解析** — 支持 `<style>` 标签、行内样式、复合选择器（类/ID/属性/后代/子代）、伪类（`:hover`/`:active`/`:disabled`）、CSS 变量（`var()`）、相对单位（`em`/`rem`/`%`/`calc()`）
 - **三种布局计算器** — **智能**（自动选择锚点/拉伸/居中）、**全拉伸**（百分比填满）、**居中**（居中轴心）
-- **可插拔标签处理器** — 内置支持 `div`/`span`/`p`/`h1~h6`/`button`/`input`/`select`/`img`/`textarea`，可通过 `ITagHandler` 扩展
+- **可插拔标签处理器** — 内置支持 `div`/`span`/`p`/`h1~h6`/`button`/`input`/`select`/`img`/`textarea`/`progress`/`meter`，可通过 `ITagHandler` 扩展
 - **文件监视** — HTML 文件变更后自动重新导入并转换
 - **预制体模板** — `UiPrefabSettings` ScriptableObject 可配置各组件对应的预制体
 

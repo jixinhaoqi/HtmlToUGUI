@@ -14,8 +14,14 @@ namespace Xxhq.Htmltougui.Editor
     /// </summary>
     public partial class ProjectPanelRightClickExtension
     {
+        const string SpriteAtlas2TmpSpriteMenuPath = "Assets/Html To UGUI/2D/SpriteAtlas -> TMP_SpriteAsset";
+        const string SpriteAtlas2SpriteSheetMenuPath = "Assets/Html To UGUI/2D/SpriteAtlas -> Sprite(Multiple)";
+        const string SpriteAtlas2SpriteGirdSheetMenuPath = "Assets/Html To UGUI/2D/SpriteAtlas -> TextureSheet";
+        const string ExportSpriteMultiplePath = "Assets/Html To UGUI/2D/Sprite(Multiple) -> Sprites";
+        const int priority = 100;
+
         //确保 SpriteAtlas功能已启用，Editor/ProjectSettings/SpriteAtlas Mode-> Enable
-        [MenuItem("Assets/Html To UGUI/2D/SpriteAtlas -> TMP_SpriteAsset", priority = 100)]
+        [MenuItem(SpriteAtlas2TmpSpriteMenuPath, priority = priority)]
         static void SpriteAtlas2TmpSpriteMenu()
         {
             var objs = Selection.objects;
@@ -27,7 +33,22 @@ namespace Xxhq.Htmltougui.Editor
                 }
             }
         }
-        [MenuItem("Assets/Html To UGUI/2D/SpriteAtlas -> Sprite(Multiple)", priority = 101)]
+
+        [MenuItem(SpriteAtlas2TmpSpriteMenuPath, true, priority = priority)]
+        static bool SpriteAtlas2TmpSpriteMenu_Validate()
+        {
+            var objs = Selection.objects;
+            if (objs == null || objs.Length == 0)
+                return false;
+            foreach (var item in objs)
+            {
+                if (item as SpriteAtlas == null)
+                    return false;
+            }
+            return true;
+        }
+
+        [MenuItem(SpriteAtlas2SpriteSheetMenuPath, priority = priority + 1)]
         static void SpriteAtlas2SpriteSheetMenu()
         {
             var objs = Selection.objects;
@@ -39,11 +60,26 @@ namespace Xxhq.Htmltougui.Editor
                 }
             }
         }
-        [MenuItem("Assets/Html To UGUI/2D/SpriteAtlas -> TextureSheet", priority = 102)]
+
+        [MenuItem(SpriteAtlas2SpriteSheetMenuPath, true, priority = priority + 1)]
+        static bool SpriteAtlas2SpriteSheetMenu_Validate()
+        {
+            var objs = Selection.objects;
+            if (objs == null || objs.Length == 0)
+                return false;
+            foreach (var item in objs)
+            {
+                if (item as SpriteAtlas == null)
+                    return false;
+            }
+            return true;
+        }
+
+
+        [MenuItem(SpriteAtlas2SpriteGirdSheetMenuPath, priority = priority + 2)]
         static void SpriteAtlas2SpriteGirdSheetMenu()
         {
             var objs = Selection.objects;
-            if (objs.Length == 0) return;
             foreach (var item in objs)
             {
                 if (item is SpriteAtlas spAtlas)
@@ -59,6 +95,20 @@ namespace Xxhq.Htmltougui.Editor
                     Sprites2SpriteAtlas(sprites, textureFileName);
                 }
             }
+        }
+
+        [MenuItem(SpriteAtlas2SpriteGirdSheetMenuPath, true, priority = priority + 2)]
+        static bool SpriteAtlas2SpriteGirdSheetMenu_Validate()
+        {
+            var objs = Selection.objects;
+            if (objs == null || objs.Length == 0)
+                return false;
+            foreach (var item in objs)
+            {
+                if (item as SpriteAtlas == null)
+                    return false;
+            }
+            return true;
         }
         /// <summary>
         /// 将一组 Sprite 按行排列合并为一张网格纹理并输出到文件。
@@ -254,7 +304,7 @@ namespace Xxhq.Htmltougui.Editor
         /// <summary>
         /// 导出Multiple类型的Sprite为碎图
         /// </summary>
-        [MenuItem("Assets/Html To UGUI/2D/Sprite(Multiple) -> Sprites", priority = 104)]
+        [MenuItem(ExportSpriteMultiplePath, priority = priority+3)]
         static void ExportSpriteMultiple()
         {
             int selectAssetsCount = Selection.objects.Length;
@@ -337,6 +387,20 @@ namespace Xxhq.Htmltougui.Editor
                 texImporter.SaveAndReimport();
             }
             EditorUtility.ClearProgressBar();
+        }
+
+        [MenuItem(ExportSpriteMultiplePath,true, priority = priority + 3)]
+        static bool ExportSpriteMultiple_Validate()
+        {
+            var objs = Selection.objects;
+            if (objs == null || objs.Length == 0)
+                return false;
+            foreach (var item in objs)
+            {
+                if (item as Sprite == null && item as Texture2D == null)
+                    return false;
+            }
+            return true;
         }
 
         private static bool SpriteAtlas2Texture(SpriteAtlas atlas, string outputFile, TextureImporterType texType = TextureImporterType.Default)

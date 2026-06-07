@@ -4,6 +4,24 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-06-07
+
+### Added
+- Hierarchy right-click layout menu: select UI elements, right-click → `GameObject/Html To UGUI/` to apply Smart/Center/Stretch layout, recursively processes children
+- LayoutCalculator.ApplyAbsoluteLayoutStrategy changed from `protected` to `public`, enabling external invocation
+- `<progress>` and `<meter>` tag support, mapped to Slider component
+- `:checked` pseudo-class support for Toggle/Dropdown selected state styling
+- Dropdown item pseudo-class color support (`ApplyDropdownItemPseudoColors`)
+- ScrollView CSS `scrollbar-width` (`thin`) and `scrollbar-color` property support; dynamic Content sizing based on child elements
+
+### Changed
+- SpriteAtlas right-click menu refactored: menu paths extracted to constants, added `Validate` methods for all 4 MenuItems, fixed null-reference checks
+- Selectable color setter simplified: `Action<ColorBlock, Color>` → `Action<Color>`; `MaskableGraphic` → `targetGraphic`
+
+### Fixed
+- Fixed font-size alignment: `fontSize` unified to `v-1` for both TMP and Legacy Text
+- Fixed text overflow: single-line text now also sets `verticalOverflow` to prevent vertical overflow
+
 ## [0.2.0] - 2026-06-05
 
 ### Added

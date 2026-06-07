@@ -477,7 +477,7 @@ namespace Xxhq.Htmltougui.Editor
             int safeIndex = Mathf.Clamp(_layoutCalculatorIndex, 0, _layoutCalculatorTypes.Length - 1);
             _cssParser = new CssParser();
             _layoutCalculator = _layoutCalculatorTypes[safeIndex];
-            _elementFactory = new UguiElementFactory(_prefabs, _isLegacyText, _htmlFilePath, _cssParser.CurrentPseudoClassStyles, _isTextOverflow);
+            _elementFactory = new UguiElementFactory(_prefabs, _isLegacyText, _htmlFilePath, _cssParser, _isTextOverflow);
         }
 
         private void ConvertHtmlToUgui()

@@ -2,7 +2,7 @@
 
 [![Unity](https://img.shields.io/badge/Unity-2019.4%2B-black?logo=unity)](https://unity.com/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.md)
-![Version](https://img.shields.io/badge/version-0.2.0-blue)
+![Version](https://img.shields.io/badge/version-0.3.0-blue)
 
 Convert HTML + CSS content into Unity UGUI (Canvas) hierarchies at Editor time.
 
@@ -12,7 +12,7 @@ Convert HTML + CSS content into Unity UGUI (Canvas) hierarchies at Editor time.
 
 - **CSS Parsing** — supports `<style>` tags, inline styles, compound selectors (class/ID/attribute/descendant/child), pseudo-classes (`:hover`/`:active`/`:disabled`), CSS variables (`var()`), and relative units (`em`/`rem`/`%`/`calc()`)
 - **Three Layout Calculators** — **Smart** (auto-chooses anchor/stretch/center), **Stretch** (full percentage), **Center** (centered pivot)
-- **Pluggable Tag Handlers** — built-in support for `div`/`span`/`p`/`h1~h6`/`button`/`input`/`select`/`img`/`textarea`, extendable via `ITagHandler`
+- **Pluggable Tag Handlers** — built-in support for `div`/`span`/`p`/`h1~h6`/`button`/`input`/`select`/`img`/`textarea`/`progress`/`meter`, extendable via `ITagHandler`
 - **File Watcher** — automatically re-imports and converts on HTML file changes
 - **Prefab Templates** — `UiPrefabSettings` ScriptableObject configures per-component prefabs
 

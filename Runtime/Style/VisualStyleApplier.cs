@@ -18,7 +18,7 @@ namespace Xxhq.Htmltougui
         /// </summary>
         public static System.Func<GameObject, string, string, bool> LoadImageFunc { get; set; }
 
-        public static readonly string[] SelectablePseudoClassStyles = { "hover", "active", "enabled", "disabled", "selected", "focus" };
+        public static readonly string[] SelectablePseudoClassStyles = { "hover", "active", "enabled", "disabled", "selected", "focus", "checked" };
         private static readonly float _imgRaycastAlphaThreshold = 0.1f; // 透明度阈值，低于该值时不响应点击事件
         /// <summary>
         /// 应用于 GameObject 的通用视觉样式（背景色/图、边框、透明度、伪类交互颜色）
@@ -182,7 +182,7 @@ namespace Xxhq.Htmltougui
             ColorBlock cb = selectable.colors;
             bool hasColor= false;
             bool isText = false;
-            if (selectable.GetComponent<MaskableGraphic>() is MaskableGraphic mg)
+            if (selectable.targetGraphic is Graphic mg)
             {
                 isText = mg is Text|| mg is TextMeshProUGUI;
                 cb.normalColor = mg.color;
@@ -192,14 +192,15 @@ namespace Xxhq.Htmltougui
                 cb.selectedColor = mg.color;
             }
 
-            var setterMap = new Dictionary<string, Action<ColorBlock, Color>>
+            var setterMap = new Dictionary<string, Action<Color>>
             {
-                { "hover", (blk, co) => blk.highlightedColor = co },
-                { "active", (blk, co) => blk.pressedColor = co },
-                { "enabled", (blk, co) => blk.normalColor = co },
-                { "disabled", (blk, co) => blk.disabledColor = co },
-                { "selected", (blk, co) => blk.selectedColor = co },
-                { "focus", (blk, co) => blk.selectedColor = co }
+                { "hover", (co) => cb.highlightedColor = co },
+                { "active", (co) => cb.pressedColor = co },
+                { "enabled", (co) => cb.normalColor = co },
+                { "disabled", (co) => cb.disabledColor = co },
+                { "selected", (co) => cb.selectedColor = co },
+                { "focus", (co) => cb.selectedColor = co },
+                { "checked", (co) => cb.selectedColor = co }
             };
 
             foreach (var kv in setterMap)
@@ -211,19 +212,82 @@ namespace Xxhq.Htmltougui
                 ColorParser.TryParseBackgroundColor(pseudoClassStyles[pseudoKey], out c)))
                 {
                     hasColor = true;
-                    setter(cb, c);
+                    setter(c);
                 }
             }
 
             if (hasColor)
             {
                 selectable.colors = cb;
-                if (selectable.GetComponent<MaskableGraphic>() is MaskableGraphic mg2)
+                if (selectable.targetGraphic is Graphic mg2)
                 {
                     mg2.color = Color.white;
                 }
             }
                 
+        }
+
+
+        /// <summary>
+        /// 应用于下拉菜单项的伪类颜色设置。支持 hover、active 等状态颜色。
+        /// </summary>
+        /// <param name="selectable">目标 Selectable 组件</param>
+        /// <param name="pseudoClassStyles">伪类样式字典</param>
+        /// <param name="styles">样式字典</param>
+        public static void ApplyDropdownItemPseudoColors(Selectable selectable,
+    Dictionary<string, Dictionary<string, string>> pseudoClassStyles, Dictionary<string, string> styles)
+        {
+            ColorBlock cb = selectable.colors;
+            bool hasColor = false;
+            if(ColorParser.TryParseBackgroundColor(styles, out Color bColor))
+            {
+                hasColor = true;
+                cb.normalColor = bColor;
+                cb.highlightedColor = bColor;
+                cb.pressedColor = bColor;
+                cb.disabledColor = bColor;
+                cb.selectedColor = bColor;
+            }
+            else if (selectable.targetGraphic is Graphic mg)
+            {
+                cb.normalColor = mg.color;
+                cb.highlightedColor = mg.color;
+                cb.pressedColor = mg.color;
+                cb.disabledColor = mg.color;
+                cb.selectedColor = mg.color;
+            }
+
+            var setterMap = new Dictionary<string, Action<Color>>
+            {
+                { "hover", (co) => cb.highlightedColor = co },
+                { "active", (co) => cb.pressedColor = co },
+                { "enabled", (co) => cb.normalColor = co },
+                { "disabled", (co) => cb.disabledColor = co },
+                { "selected", (co) => cb.selectedColor = co },
+                { "focus", (co) => cb.selectedColor = co },
+                { "checked", (co) => cb.selectedColor = co }
+            };
+
+            foreach (var kv in setterMap)
+            {
+                string pseudoKey = kv.Key;
+                var setter = kv.Value;
+                if (pseudoClassStyles.ContainsKey(pseudoKey) && ColorParser.TryParseBackgroundColor(pseudoClassStyles[pseudoKey], out Color c))
+                {
+                    hasColor = true;
+                    setter(c);
+                }
+            }
+
+            if (hasColor)
+            {
+                selectable.colors = cb;
+                if (selectable.targetGraphic is Graphic mg2)
+                {
+                    mg2.color = Color.white;
+                }
+            }
+
         }
     }
 }

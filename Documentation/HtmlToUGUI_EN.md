@@ -73,6 +73,50 @@ Three implementations of `LayoutCalculator` control how `data-u-left/top/width/h
 
 Smart Calculator's thresholds can be tuned in the converter window under "Layout Calculator".
 
+### HTML Element Support
+
+Built-in tag handler mappings:
+
+| HTML Tag | UGUI Component |
+|---|---|
+| `div` / `span` / `p` | Container (empty GameObject + RectTransform) |
+| `h1` ~ `h6` | Container + Text (font-size scaled by heading level) |
+| `button` | Button + Text |
+| `input` | InputField / Toggle / Slider (based on `type` attribute) |
+| `select` | Dropdown |
+| `img` | Image (supports single/multiple/atlas modes) |
+| `textarea` | InputField (multiline) |
+| `progress` / `meter` | Slider (non-interactive) |
+| ScrollView | ScrollRect (with scrollbar styling) |
+
+ScrollView additionally supports CSS properties `scrollbar-width` (`thin`) and `scrollbar-color` (`thumb-color track-color`), as well as `::-webkit-scrollbar`/`::-webkit-scrollbar-thumb`/`::-webkit-scrollbar-track` pseudo-element styles. Content size is automatically calculated from child element positions.
+
+### Pseudo-Class Interaction States
+
+Supported CSS pseudo-classes and their Unity ColorBlock mappings:
+
+| Pseudo-class | ColorBlock Property |
+|---|---|
+| `:enabled` / default | `normalColor` |
+| `:hover` | `highlightedColor` |
+| `:active` | `pressedColor` |
+| `:disabled` | `disabledColor` |
+| `:selected` / `:focus` / `:checked` | `selectedColor` |
+
+Dropdown items additionally support independent pseudo-class color settings (`ApplyDropdownItemPseudoColors`), preventing color conflicts with the parent Dropdown.
+
+## Hierarchy Right-Click Layout
+
+Select UI elements in the Hierarchy window, right-click → **GameObject → Html To UGUI** to apply a layout calculator directly to existing UGUI elements:
+
+| Menu Item | Description |
+|---|---|
+| Append Smart Layout | Recalculates anchors and offsets using the smart layout calculator |
+| Append Center Layout | Centers the element and its children within the parent |
+| Append Stretch Layout | Stretches the element to fill the parent |
+
+Layout is applied recursively to all children, automatically skipping inactive objects, TMP_SubMeshUI, rotated/scaled objects, and correctly handling ScrollRect content nodes.
+
 ## SpriteAtlas Tools
 
 Select a **SpriteAtlas** or **Sprite(Multiple)** asset in the Project window and right-click → **Assets → Html To UGUI → 2D**:
@@ -118,5 +162,7 @@ The `com.unity.2d.sprite` package must be installed. SpriteAtlas support must be
 
 | Date | Reason |
 |---|---|
+| Jun 7, 2026 | Added HTML element support table, pseudo-class interaction states; scrollbar/progress docs |
+| Jun 5, 2026 | Added Hierarchy right-click layout menu; SpriteAtlas menu refactoring |
 | Jun 4, 2026 | Updated with floating text limitation; removed Comparison section |
 | May 19, 2026 | Initial release |

@@ -10,7 +10,7 @@ namespace Xxhq.Htmltougui
     public class CenterLayoutCalculator : LayoutCalculator
     {
         /// <inheritdoc/>
-        protected override void ApplyAbsoluteLayoutStrategy(
+        public override void ApplyAbsoluteLayoutStrategy(
             float relativeX, float relativeY, float selfWidth, float selfHeight,
             float parentWidth, float parentHeight,
             ref Vector2 anchorMin, ref Vector2 anchorMax, ref Vector2 anchoredPosition,

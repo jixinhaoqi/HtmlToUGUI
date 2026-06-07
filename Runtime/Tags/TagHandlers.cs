@@ -68,6 +68,25 @@ namespace Xxhq.Htmltougui
         }
     }
 
+    public class ProgressTagHandler : ITagHandler
+    {
+        public virtual IReadOnlyList<string> SupportedTags { get; } =
+            new[] { "progress", "meter" };
+
+        public virtual GameObject CreateElement(HtmlNode node, Dictionary<string, string> styles,
+            Transform parent, IElementFactory factory)
+        {
+            switch (node.Name.ToLower())
+            {
+                case "progress":
+                case "meter":
+                    return factory.CreateSlider(node, styles, parent);
+                default:
+                    return factory.CreateContainer(node, styles, parent);
+            }
+        }
+    }
+
     /// <summary> h1 ~ h6 — 标题 </summary>
     public class HeadingTagHandler : ITagHandler
     {

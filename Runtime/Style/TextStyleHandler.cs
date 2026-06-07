@@ -53,7 +53,7 @@ namespace Xxhq.Htmltougui
                         tmp.enableWordWrapping = false;
 #endif
                     float v = UnitParser.Parse(textSize);
-                    if (v != 0) tmp.fontSize = v;
+                    if (v != 0) tmp.fontSize = v-1;
                 }
 
                 // 字间距
@@ -68,9 +68,13 @@ namespace Xxhq.Htmltougui
                 if (styles.TryGetValue("font-size", out string textSize))
                 {
                     if (!MultiLineTextNodes.Contains(node.Name.ToLower()) && isTextOverflow)
+                    {
                         txt.horizontalOverflow = HorizontalWrapMode.Overflow;
+                        txt.verticalOverflow = VerticalWrapMode.Overflow;
+                    }
+
                     float v = UnitParser.Parse(textSize);
-                    if (v != 0) txt.fontSize = (int)v;
+                    if (v != 0) txt.fontSize = (int)(v-1);
                 }
             }
 

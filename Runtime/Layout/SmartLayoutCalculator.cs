@@ -17,7 +17,7 @@ namespace Xxhq.Htmltougui
         /// <summary> 轴对齐百分比阈值范围 (min, max)，用于判断元素是否接近父容器边界 </summary>
         public Vector2 AxisAlignPercentThresholdRange { get; set; } = new Vector2(0.5f, 0.75f);
 
-        protected override void ApplyAbsoluteLayoutStrategy(
+        public override void ApplyAbsoluteLayoutStrategy(
             float relativeX, float relativeY, float selfWidth, float selfHeight,
             float parentWidth, float parentHeight,
             ref Vector2 anchorMin, ref Vector2 anchorMax, ref Vector2 anchoredPosition,

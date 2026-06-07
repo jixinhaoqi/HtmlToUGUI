@@ -1,7 +1,6 @@
-using System;
+using HtmlAgilityPack;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using HtmlAgilityPack;
 using UnityEngine;
 
 namespace Xxhq.Htmltougui
@@ -35,23 +34,54 @@ namespace Xxhq.Htmltougui
         /// <param name="rt">要设置的 RectTransform</param>
         /// <param name="styles">包含 CSS 属性的字典</param>
         /// <param name="node">对应的 HTML 节点</param>
-        public virtual void SetAnchorAndSize(RectTransform rt, Dictionary<string, string> styles, HtmlNode node = null)
+        public virtual void SetAnchorAndSize(RectTransform rt, Dictionary<string, string> styles, HtmlNode node)
         {
-            string dataULeft = node?.GetAttributeValue("data-u-left", "");
-
-            if (!string.IsNullOrWhiteSpace(dataULeft))
+            var layoutData = GetLayoutData(rt, styles, node);
+            if (layoutData.isAbsoluteLayout)
             {
-                CalculateAbsoluteLayout(rt, node);
+                CalculateAbsoluteLayout(rt, layoutData.x, layoutData.y, layoutData.width, layoutData.height, layoutData.parentWidth, layoutData.parentHeight);
             }
             else
             {
-                CalculateRelativeLayout(rt, styles);
+                CalculateRelativeLayout(rt, styles, layoutData.x, layoutData.y, layoutData.width, layoutData.height, layoutData.parentWidth, layoutData.parentHeight);
             }
+        }
+
+        public static (bool isAbsoluteLayout, string x, string y, string width, string height, string parentWidth, string parentHeight) GetLayoutData(RectTransform rt, Dictionary<string, string> styles, HtmlNode node)
+        {
+            bool isAbsoluteLayout= !string.IsNullOrWhiteSpace(node?.GetAttributeValue("data-u-left", ""));
+            string x = "", y = "", width = "", height = "", parentWidth = "", parentHeight = "";
+            RectTransform parentRt = rt.parent as RectTransform;
+            if (isAbsoluteLayout)
+            {
+                parentWidth = parentRt? parentRt.rect.width.ToString(): node.ParentNode.GetAttributeValue("data-u-width", "0");
+                parentHeight = parentRt? parentRt.rect.height.ToString(): node.ParentNode.GetAttributeValue("data-u-height", "0");
+                width = node.GetAttributeValue("data-u-width", "0");
+                height = node.GetAttributeValue("data-u-height", "0");
+                x = (UnitParser.Parse(node.GetAttributeValue("data-u-left", "0"))
+                    - UnitParser.Parse(node.ParentNode.GetAttributeValue("data-u-left", "0"))).ToString();
+                y = (UnitParser.Parse(node.GetAttributeValue("data-u-top", "0"))
+                    - UnitParser.Parse(node.ParentNode.GetAttributeValue("data-u-top", "0"))).ToString();
+            }
+            else
+            {
+                parentWidth = parentRt ? parentRt.rect.width.ToString() : "100%";
+                parentHeight = parentRt ? parentRt.rect.height.ToString() : "100%";
+                width = styles.TryGetValue("width", out string w) ? w : parentWidth;
+                height = styles.TryGetValue("height", out string h) ? h : parentHeight;
+                if (width.Contains("calc"))
+                    width = UnitParser.Parse(width, UnitParser.Parse(parentWidth)).ToString();
+                if (height.Contains("calc"))
+                    height = UnitParser.Parse(height, UnitParser.Parse(parentHeight)).ToString();
+                x = styles.TryGetValue("left", out string l) ? l : "";
+                y = styles.TryGetValue("top", out string t) ? t : "";
+            }
+            return (isAbsoluteLayout, x, y, width, height, parentWidth, parentHeight);
         }
 
         #region 绝对定位布局（基于 data-u-* 属性）
 
-        protected virtual void CalculateAbsoluteLayout(RectTransform rt, HtmlNode node)
+        protected virtual void CalculateAbsoluteLayout(RectTransform rt, string x, string y, string width, string height, string parentWidth, string parentHeight)
         {
             Vector2 anchorMin = new Vector2(0, 1);
             Vector2 anchorMax = new Vector2(0, 1);
@@ -59,24 +89,18 @@ namespace Xxhq.Htmltougui
             Vector2 anchoredPosition = Vector2.zero;
             float? offsetMinX = null, offsetMinY = null, offsetMaxX = null, offsetY = null;
 
-            float parentWidth = UnitParser.Parse(node.ParentNode.GetAttributeValue("data-u-width", ""));
-            float parentHeight = UnitParser.Parse(node.ParentNode.GetAttributeValue("data-u-height", ""));
-            if (parentWidth == 0) parentWidth = rt.parent.GetComponent<RectTransform>().rect.width;
-            if (parentHeight == 0) parentHeight = rt.parent.GetComponent<RectTransform>().rect.height;
+            float xValue = UnitParser.Parse(x);
+            float yValue = UnitParser.Parse(y);
+            float widthValue = UnitParser.Parse(width);
+            float heightValue = UnitParser.Parse(height);
+            float parentWidthValue = UnitParser.Parse(parentWidth);
+            float parentHeightValue = UnitParser.Parse(parentHeight);
+            anchoredPosition.x = xValue + widthValue / 2f;
+            anchoredPosition.y = -yValue - heightValue / 2f;
+            rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, widthValue);
+            rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, heightValue);
 
-            float selfWidth = UnitParser.Parse(node.GetAttributeValue("data-u-width", ""));
-            float selfHeight = UnitParser.Parse(node.GetAttributeValue("data-u-height", ""));
-            float relativeX = UnitParser.Parse(node.GetAttributeValue("data-u-left", ""))
-                - UnitParser.Parse(node.ParentNode.GetAttributeValue("data-u-left", ""));
-            float relativeY = UnitParser.Parse(node.GetAttributeValue("data-u-top", ""))
-                - UnitParser.Parse(node.ParentNode.GetAttributeValue("data-u-top", ""));
-
-            anchoredPosition.x = relativeX + selfWidth / 2f;
-            anchoredPosition.y = -relativeY - selfHeight / 2f;
-            rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, selfWidth);
-            rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, selfHeight);
-
-            ApplyAbsoluteLayoutStrategy(relativeX, relativeY, selfWidth, selfHeight, parentWidth, parentHeight,
+            ApplyAbsoluteLayoutStrategy(xValue, yValue, widthValue, heightValue, parentWidthValue, parentHeightValue,
                 ref anchorMin, ref anchorMax, ref anchoredPosition,
                 out offsetMinX, out offsetMinY, out offsetMaxX, out offsetY);
 
@@ -92,7 +116,7 @@ namespace Xxhq.Htmltougui
 
         #region 相对定位布局（基于 CSS left/top/width/height）
 
-        protected virtual void CalculateRelativeLayout(RectTransform rt, Dictionary<string, string> styles)
+        protected virtual void CalculateRelativeLayout(RectTransform rt, Dictionary<string, string> styles, string x, string y, string width, string height, string parentWidth, string parentHeight)
         {
             Vector2 anchorMin = new Vector2(0, 1);
             Vector2 anchorMax = new Vector2(0, 1);
@@ -101,14 +125,6 @@ namespace Xxhq.Htmltougui
             float? offsetMinX = null, offsetMinY = null, offsetMaxX = null, offsetMaxY = null;
 
             RectTransform parentRt = rt.parent as RectTransform;
-            string parentWidth = parentRt ? parentRt.rect.width.ToString() : "100%";
-            string parentHeight = parentRt ? parentRt.rect.height.ToString() : "100%";
-            string width = styles.TryGetValue("width", out string w) ? w : parentWidth;
-            string height = styles.TryGetValue("height", out string h) ? h : parentHeight;
-            if(width.Contains("calc"))
-                width = UnitParser.Parse(width, UnitParser.Parse(parentWidth)).ToString();
-            if (height.Contains("calc"))
-                height = UnitParser.Parse(height, UnitParser.Parse(parentHeight)).ToString();
             rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, UnitParser.Parse(width));
             rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, UnitParser.Parse(height));
             // transform: translate
@@ -143,10 +159,10 @@ namespace Xxhq.Htmltougui
             }
 
             // left
-            if (styles.TryGetValue("left", out string left))
+            if (!string.IsNullOrEmpty(x))
             {
-                if (left.Contains("%")) anchorMin.x = anchorMax.x = UnitParser.Parse(left) / 100f;
-                else anchoredPosition.x = UnitParser.Parse(left);
+                if (x.Contains("%")) anchorMin.x = anchorMax.x = UnitParser.Parse(x) / 100f;
+                else anchoredPosition.x = UnitParser.Parse(x);
             }
             else
             {
@@ -166,10 +182,10 @@ namespace Xxhq.Htmltougui
             }
 
             // top
-            if (styles.TryGetValue("top", out string top))
+            if (!string.IsNullOrEmpty(y))
             {
-                if (top.Contains("%")) anchorMin.y = anchorMax.y = 1 - UnitParser.Parse(top) / 100f;
-                else anchoredPosition.y = -UnitParser.Parse(top);
+                if (y.Contains("%")) anchorMin.y = anchorMax.y = 1 - UnitParser.Parse(y) / 100f;
+                else anchoredPosition.y = -UnitParser.Parse(y);
             }
             else
             {
@@ -200,7 +216,7 @@ namespace Xxhq.Htmltougui
 
         #region 布局策略
 
-        protected abstract void ApplyAbsoluteLayoutStrategy(
+        public abstract void ApplyAbsoluteLayoutStrategy(
             float relativeX, float relativeY, float selfWidth, float selfHeight,
             float parentWidth, float parentHeight,
             ref Vector2 anchorMin, ref Vector2 anchorMax, ref Vector2 anchoredPosition,

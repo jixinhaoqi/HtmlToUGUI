@@ -1,12 +1,11 @@
 using HtmlAgilityPack;
 using System.Collections.Generic;
-using System.Linq;
 using System.Globalization;
+using System.Linq;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
-using Xxhq.Htmltougui;
 
 namespace Xxhq.Htmltougui.Editor
 {
@@ -19,17 +18,17 @@ namespace Xxhq.Htmltougui.Editor
         private readonly bool _isLegacyText;
         private readonly bool _isTextOverflow;
         private readonly string _htmlFilePath;
-        private readonly Dictionary<string, Dictionary<string, string>> _pseudoClassStyles;
+        private readonly CssParser _cssParser;
 
         public UguiElementFactory(UiPrefabSettings prefabs, bool isLegacyText,
-            string htmlFilePath, Dictionary<string, Dictionary<string, string>> pseudoClassStyles,
+            string htmlFilePath, CssParser cssParser,
             bool isTextOverflow = true)
         {
             _prefabs = prefabs;
             _isLegacyText = isLegacyText;
             _isTextOverflow = isTextOverflow;
             _htmlFilePath = htmlFilePath;
-            _pseudoClassStyles = pseudoClassStyles;
+            _cssParser = cssParser;
             // 注入 Editor 端的图片加载实现到 Runtime 的 VisualStyleApplier
             if (VisualStyleApplier.LoadImageFunc == null)
                 VisualStyleApplier.LoadImageFunc = ResourceLoader.LoadImage;
@@ -98,9 +97,9 @@ namespace Xxhq.Htmltougui.Editor
 
             if (haveBg)
             {
-                var img = go.GetComponent<Image>()?? go.AddComponent<Image>();
+                var img = go.GetComponentInChildren<Image>()?? go.AddComponent<Image>();
                 img.color = haveColor ? color : haveUrl ? Color.white : Color.clear;
-                VisualStyleApplier.ApplyCommonStyles(go, styles, _pseudoClassStyles, _htmlFilePath);
+                VisualStyleApplier.ApplyCommonStyles(go, styles, _cssParser.CurrentPseudoClassStyles, _htmlFilePath);
                 NodeHelper.CreateInterTextIfHas(node, styles, go.transform, CreateText);
             }
 
@@ -139,22 +138,21 @@ namespace Xxhq.Htmltougui.Editor
             MaskableGraphic text = go.GetComponentInChildren<TextMeshProUGUI>()
                 ?? go.GetComponentInChildren<Text>() as MaskableGraphic;
 
-            if (text != null)
-            {
-                string v = string.IsNullOrWhiteSpace(customText) ? NodeHelper.GetNodeText(node, styles, _isLegacyText) : customText;
-                if (text is TextMeshProUGUI tmp)
-                { tmp.fontSize = 14; tmp.text = v; }
-                else if (text is Text txt)
-                    txt.text = v;
+            if(text == null) return go;
 
-                TextStyleHandler.Apply(node, text, styles,
-                    node.Name.ToLower() != "textarea"
-                        ? node.Name.ToLower() == "img" ? HorizontalAlignmentOptions.Center : HorizontalAlignmentOptions.Left : HorizontalAlignmentOptions.Left,
-                    node.Name.ToLower() != "textarea"
-                        ? VerticalAlignmentOptions.Middle : VerticalAlignmentOptions.Top,
-                    notSetColor: false,
-                    isTextOverflow: _isTextOverflow);
-            }
+            string v = string.IsNullOrWhiteSpace(customText) ? NodeHelper.GetNodeText(node, styles, _isLegacyText) : customText;
+            if (text is TextMeshProUGUI tmp)
+            { tmp.fontSize = 14; tmp.text = v; }
+            else if (text is Text txt)
+                txt.text = v;
+
+            TextStyleHandler.Apply(node, text, styles,
+                node.Name.ToLower() != "textarea"
+                    ? node.Name.ToLower() == "img" ? HorizontalAlignmentOptions.Center : HorizontalAlignmentOptions.Left : HorizontalAlignmentOptions.Left,
+                node.Name.ToLower() != "textarea"
+                    ? VerticalAlignmentOptions.Middle : VerticalAlignmentOptions.Top,
+                notSetColor: false,
+                isTextOverflow: _isTextOverflow);
 
             // 超链接处理
             if (node.Name.ToLower() == "a")
@@ -184,7 +182,7 @@ namespace Xxhq.Htmltougui.Editor
                 }
             }
 
-            VisualStyleApplier.ApplyPseudoClassStyles(go, _pseudoClassStyles);
+            VisualStyleApplier.ApplyPseudoClassStyles(go, _cssParser.CurrentPseudoClassStyles);
             return go;
         }
         /// <summary>
@@ -216,22 +214,20 @@ namespace Xxhq.Htmltougui.Editor
             }
 
             MaskableGraphic text = _isLegacyText? go.GetComponentInChildren<Text>() as MaskableGraphic : go.GetComponentInChildren<TextMeshProUGUI>() as MaskableGraphic;
-            if (text != null)
+            if(text==null) return go;
+
+            string value = node.GetAttributeValue("type", "") == "submit"
+                ? node.GetAttributeValue("value", "") : "";
+            if (text is TextMeshProUGUI tmp)
             {
-                string value = node.GetAttributeValue("type", "") == "submit"
-                    ? node.GetAttributeValue("value", "") : "";
-                if (text is TextMeshProUGUI tmp)
-                {
-                    tmp.fontSize = 14;
-                    tmp.text = !string.IsNullOrWhiteSpace(value) ? value : NodeHelper.GetNodeText(node, styles, _isLegacyText);
-                }
-                else if (text is Text txt)
-                    txt.text = !string.IsNullOrWhiteSpace(value) ? value : NodeHelper.GetNodeText(node, styles, _isLegacyText);
-
-                TextStyleHandler.Apply(node, text, styles, HorizontalAlignmentOptions.Center, VerticalAlignmentOptions.Middle, isTextOverflow: _isTextOverflow);
+                tmp.fontSize = 14;
+                tmp.text = !string.IsNullOrWhiteSpace(value) ? value : NodeHelper.GetNodeText(node, styles, _isLegacyText);
             }
+            else if (text is Text txt)
+                txt.text = !string.IsNullOrWhiteSpace(value) ? value : NodeHelper.GetNodeText(node, styles, _isLegacyText);
 
-            VisualStyleApplier.ApplyCommonStyles(go, styles, _pseudoClassStyles, _htmlFilePath);
+            TextStyleHandler.Apply(node, text, styles, HorizontalAlignmentOptions.Center, VerticalAlignmentOptions.Middle, isTextOverflow: _isTextOverflow);
+            VisualStyleApplier.ApplyCommonStyles(go, styles, _cssParser.CurrentPseudoClassStyles, _htmlFilePath);
             return go;
         }
 
@@ -267,7 +263,7 @@ namespace Xxhq.Htmltougui.Editor
             }
 
             ApplyInputFieldContent(go, node, styles);
-            VisualStyleApplier.ApplyCommonStyles(go, styles, _pseudoClassStyles, _htmlFilePath);
+            VisualStyleApplier.ApplyCommonStyles(go, styles, _cssParser.CurrentPseudoClassStyles, _htmlFilePath);
             return go;
         }
 
@@ -278,7 +274,7 @@ namespace Xxhq.Htmltougui.Editor
             string value = node.GetAttributeValue("value", "");
             if (_isLegacyText)
             {
-                var inputField = go.GetComponent<InputField>();
+                var inputField = go.GetComponentInChildren<InputField>();
                 if (inputField == null) return;
                 inputField.text = value;
                 if (inputField.placeholder is Text pText)
@@ -306,7 +302,7 @@ namespace Xxhq.Htmltougui.Editor
             }
             else
             {
-                var inputField = go.GetComponent<TMP_InputField>();
+                var inputField = go.GetComponentInChildren<TMP_InputField>();
                 if (inputField == null) return;
                 inputField.text = value;
                 if (inputField.placeholder is TextMeshProUGUI pText)
@@ -349,16 +345,27 @@ namespace Xxhq.Htmltougui.Editor
                 RectTransform check = background?.Find("Checkmark")?.GetComponent<RectTransform>();
                 RectTransformHelper.FullyFillParent(background);
                 RectTransformHelper.FullyFillParent(check);
+                if(background?.GetComponent<Image>() is var bgGraphic)
+                {
+                    bgGraphic.sprite = null;
+                }
+                if (check?.GetComponent<Image>() is var checkGraphic)
+                {
+                    checkGraphic.color = Color.blue;
+                    checkGraphic.sprite = null;
+                }
             }
 
-            Toggle toggle = go.GetComponent<Toggle>();
-            if (toggle)
-            {
-                toggle.isOn = node.Attributes.Contains("checked");
-                MaskableGraphic txt = toggle.GetComponentInChildren<TextMeshProUGUI>() ?? toggle.GetComponentInChildren<Text>() as MaskableGraphic;
-                if (txt != null) UnityEngine.Object.DestroyImmediate(txt.gameObject);
-            }
-            VisualStyleApplier.ApplyCommonStyles(go, styles, _pseudoClassStyles, _htmlFilePath);
+            Toggle toggle = go.GetComponentInChildren<Toggle>();
+            if (toggle == null) return go;
+
+            toggle.isOn = node.Attributes.Contains("checked");
+            MaskableGraphic txt = toggle.GetComponentInChildren<TextMeshProUGUI>() ?? toggle.GetComponentInChildren<Text>() as MaskableGraphic;
+            if (txt != null) UnityEngine.Object.DestroyImmediate(txt.gameObject);
+
+            if (toggle.graphic && styles.ContainsKey("accent-color") && ColorParser.TryParseColor(styles["accent-color"], out var accentColor))
+                toggle.graphic.color = accentColor;
+            VisualStyleApplier.ApplyCommonStyles(go, styles, _cssParser.CurrentPseudoClassStyles, _htmlFilePath);
             return go;
         }
 
@@ -375,11 +382,37 @@ namespace Xxhq.Htmltougui.Editor
             else
             {
                 go = CreateViaMenu("GameObject/UI/Slider", parent, NodeHelper.GetNodeId(node));
-                go.GetComponentInChildren<Image>().sprite = null;
+                if (go.GetComponent<Slider>() is var sl)
+                {
+                    if(sl.transform.Find("Background")?.GetComponent<Image>() is var bg)
+                    {
+                        bg.sprite = null;
+                        bg.color = Color.gray;
+                    }
+                    if (sl.fillRect?.GetComponent<Image>() is var fill)
+                    {
+                        fill.sprite = null;
+                        fill.color = Color.blue;
+                    }
+                    if (sl.handleRect?.GetComponent<Image>() is var handle)
+                    {
+                        handle.sprite = null;
+                        handle.color = Color.blue;
+                    }
+                }
             }
 
-            Slider slider = go.GetComponent<Slider>();
-            if (slider)
+            Slider slider = go.GetComponentInChildren<Slider>();
+            if(slider == null) return go;
+            string nodeName = node.Name.ToLower();
+            if(nodeName == "progress")
+            {
+                if (float.TryParse(node.GetAttributeValue("max", "100"), NumberStyles.Float, CultureInfo.InvariantCulture, out float v))
+                    slider.maxValue = v;
+                if (float.TryParse(node.GetAttributeValue("value", "100"), NumberStyles.Float, CultureInfo.InvariantCulture, out v))
+                    slider.value = v;
+            }
+            else
             {
                 if (float.TryParse(node.GetAttributeValue("min", "0"), NumberStyles.Float, CultureInfo.InvariantCulture, out float v))
                     slider.minValue = v;
@@ -388,8 +421,113 @@ namespace Xxhq.Htmltougui.Editor
                 if (float.TryParse(node.GetAttributeValue("value", "50"), NumberStyles.Float, CultureInfo.InvariantCulture, out v))
                     slider.value = v;
             }
-            VisualStyleApplier.ApplyCommonStyles(go, styles, _pseudoClassStyles, _htmlFilePath);
+
+            VisualStyleApplier.ApplyCommonStyles(go, styles, _cssParser.CurrentPseudoClassStyles, _htmlFilePath);
+            if (nodeName == "progress"|| nodeName == "meter")
+            {
+                ConfigureProgressStyles(slider, nodeName, styles);
+            }
+            else
+            {
+                ConfigureSliderStyles(slider);
+            }
             return go;
+        }
+        internal virtual void ConfigureProgressStyles(Slider slider,string nodeName, Dictionary<string, string> styles)
+        {
+            Image background = slider.transform.Find("Background")?.GetComponent<Image>();
+            Image fill = slider.fillRect?.GetComponent<Image>();
+            Image handle = slider.handleRect?.GetComponent<Image>();
+            if(handle)
+                handle.gameObject.SetActive(false);
+            if (ColorParser.TryParseBackgroundColor(styles, out var bgColor))
+            {
+                if (background)
+                    background.color = bgColor;
+            }
+            foreach (var pseudoClass in _cssParser.CurrentPseudoClassStyles)
+            {
+                if (pseudoClass.Key == $"-webkit-{nodeName}-bar" || pseudoClass.Key == $"-moz-{nodeName}-bar")
+                {
+                    if (ColorParser.TryParseBackgroundColor(pseudoClass.Value, out var color))
+                    {
+                        if (fill)
+                            fill.color = color;
+                    }
+                    continue;
+                }
+            }
+        }
+
+        internal virtual void ConfigureSliderStyles(Slider slider)
+        {
+            Image background = slider.transform.Find("Background")?.GetComponent<Image>();
+            Image fill = slider.fillRect?.GetComponent<Image>();
+            Image handle = slider.handleRect?.GetComponent<Image>();
+            foreach (var pseudoClass in _cssParser.CurrentPseudoClassStyles)
+            {
+                if (pseudoClass.Key == "-webkit-slider-runnable-track" || pseudoClass.Key == "-moz-range-track")
+                {
+                    if (ColorParser.TryParseBackgroundColor(pseudoClass.Value, out var color))
+                    {
+                        if (background)
+                            background.color = color;
+                    }
+                    continue;
+                }
+
+                if (pseudoClass.Key == "-webkit-slider-thumb" || pseudoClass.Key == "-moz-range-thumb")
+                {
+                    if ((pseudoClass.Value.TryGetValue("-webkit-appearance", out var appearance) || pseudoClass.Value.TryGetValue("appearance", out appearance)) && appearance == "none")
+                    {
+                        if (fill)
+                            fill.color = Color.clear;
+                    }
+                    if (ColorParser.TryParseBackgroundColor(pseudoClass.Value, out var color))
+                    {
+                        if (handle)
+                        {
+                            handle.color = Color.white;
+                            ColorBlock colorBlock = slider.colors;
+                            colorBlock.normalColor = color;
+                            slider.colors = colorBlock;
+                        }
+                    }
+                    if (pseudoClass.Value.TryGetValue("width", out var width))
+                    {
+                        if (handle)
+                            handle.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, UnitParser.Parse(width));
+                    }
+                    if (pseudoClass.Value.TryGetValue("height", out var height))
+                    {
+                        if (handle)
+                            handle.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, UnitParser.Parse(height) * 2.15f);
+                    }
+                    continue;
+                }
+
+                if (pseudoClass.Key == "hover")
+                {
+                    if (pseudoClass.Value.TryGetValue("accent-color", out var accentColor) && ColorParser.TryParseColor(accentColor, out var color))
+                    {
+                        ColorBlock colorBlock = slider.colors;
+                        colorBlock.highlightedColor = color;
+                        slider.colors = colorBlock;
+                    }
+                    continue;
+                }
+                if (pseudoClass.Key == "active")
+                {
+                    if (pseudoClass.Value.TryGetValue("accent-color", out var accentColor) && ColorParser.TryParseColor(accentColor, out var color))
+                    {
+                        ColorBlock colorBlock = slider.colors;
+                        colorBlock.pressedColor = color;
+                        colorBlock.selectedColor = color;
+                        slider.colors = colorBlock;
+                    }
+                    continue;
+                }
+            }
         }
 
         /// <summary> 创建 Dropdown </summary>
@@ -414,13 +552,13 @@ namespace Xxhq.Htmltougui.Editor
             else
                 ApplyDropdownContent<TMP_Dropdown>(go, node, styles);
 
-            VisualStyleApplier.ApplyCommonStyles(go, styles, _pseudoClassStyles, _htmlFilePath);
+            VisualStyleApplier.ApplyCommonStyles(go, styles, _cssParser.CurrentPseudoClassStyles, _htmlFilePath);
             return go;
         }
 
         internal virtual void ApplyDropdownContent<T>(GameObject go, HtmlNode node, Dictionary<string, string> styles) where T : Selectable
         {
-            T dropdown = go.GetComponent<T>();
+            T dropdown = go.GetComponentInChildren<T>();
             if (dropdown == null) return;
             bool isLegacy = dropdown is Dropdown;
 
@@ -433,10 +571,25 @@ namespace Xxhq.Htmltougui.Editor
             object captionText = captionProp?.GetValue(dropdown);
             object itemText = itemTextProp?.GetValue(dropdown);
 
+            Toggle toggle = dropdown.GetComponentInChildren<Toggle>(true);
+            var firstOption = node.SelectNodes(".//option")?.FirstOrDefault();
+            Dictionary<string, string> firstOptionStyles = styles;
+            if (toggle&&firstOption != null)
+            {
+                Dictionary<string, Dictionary<string, string>> tempPseudoClassStyles = new Dictionary<string, Dictionary<string, string>>(_cssParser.CurrentPseudoClassStyles);
+                firstOptionStyles = _cssParser.ResolveStyles(firstOption, styles);
+                VisualStyleApplier.ApplyDropdownItemPseudoColors(toggle, _cssParser.CurrentPseudoClassStyles, firstOptionStyles);
+                _cssParser.CurrentPseudoClassStyles.Clear();
+                foreach (var kv in tempPseudoClassStyles)
+                    _cssParser.CurrentPseudoClassStyles[kv.Key] = kv.Value;
+            }
+            else
+                firstOption = node;
+
             if (captionText is MaskableGraphic captionGraphic)
                 TextStyleHandler.Apply(node, captionGraphic, styles, HorizontalAlignmentOptions.Left, isTextOverflow: _isTextOverflow);
             if (itemText is MaskableGraphic itemGraphic)
-                TextStyleHandler.Apply(node, itemGraphic, styles, HorizontalAlignmentOptions.Left, isTextOverflow: _isTextOverflow);
+                TextStyleHandler.Apply(firstOption, itemGraphic, firstOptionStyles, HorizontalAlignmentOptions.Left, isTextOverflow: _isTextOverflow);
 
             if (captionText is RectTransform captionRt && PaddingParser.TryParse(styles, out RectOffset rectOffset))
             {
@@ -477,7 +630,7 @@ namespace Xxhq.Htmltougui.Editor
             GameObject go = new GameObject(NodeHelper.GetNodeId(node), typeof(RectTransform), typeof(Image));
             go.transform.SetParent(parent, false);
             bool success = ResourceLoader.LoadImage(go, node.GetAttributeValue("src", ""), _htmlFilePath);
-            VisualStyleApplier.ApplyCommonStyles(go, styles, _pseudoClassStyles, _htmlFilePath);
+            VisualStyleApplier.ApplyCommonStyles(go, styles, _cssParser.CurrentPseudoClassStyles, _htmlFilePath);
             if (!success&&node.GetAttributeValue("alt", "") is string alt && !string.IsNullOrEmpty(alt))
             {
                 NodeHelper.CreateInterTextIfHas(node, styles, go.transform, CreateText, alt);
@@ -500,19 +653,23 @@ namespace Xxhq.Htmltougui.Editor
                 go = CreateViaMenu("GameObject/UI/Scroll View", parent, NodeHelper.GetNodeId(node));
                 go.GetComponent<Image>().sprite = null;
                 go.GetComponent<Image>().color = Color.clear;
+                RectTransformHelper.FullyFillParent(go.GetComponent<ScrollRect>().verticalScrollbar.transform.GetChild(0).GetComponent<RectTransform>());
+                RectTransformHelper.FullyFillParent(go.GetComponent<ScrollRect>().verticalScrollbar.transform.GetChild(0).GetChild(0).GetComponent<RectTransform>());
+                RectTransformHelper.FullyFillParent(go.GetComponent<ScrollRect>().horizontalScrollbar.transform.GetChild(0).GetComponent<RectTransform>());
+                RectTransformHelper.FullyFillParent(go.GetComponent<ScrollRect>().horizontalScrollbar.transform.GetChild(0).GetChild(0).GetComponent<RectTransform>());
             }
-
-            ConfigureScrollRect(go, styles);
-            VisualStyleApplier.ApplyCommonStyles(go, styles, _pseudoClassStyles, _htmlFilePath);
-            NodeHelper.CreateInterTextIfHas(node, styles, go.GetComponentInChildren<ScrollRect>().content ?? go.transform, CreateText);
+            ScrollRect scrollRect = go.GetComponentInChildren<ScrollRect>();
+            if (scrollRect == null || scrollRect.content == null) return go;
+            ConfigureScrollRect(scrollRect, styles);
+            ConfigureScrollRectContentSize(node, styles, scrollRect);
+            NodeHelper.CreateInterTextIfHas(node, styles, scrollRect.content, CreateText);
+            VisualStyleApplier.ApplyCommonStyles(go, styles, _cssParser.CurrentPseudoClassStyles, _htmlFilePath);
+            ConfigureScrollbarStyles(scrollRect);
             return go;
         }
 
-        internal virtual void ConfigureScrollRect(GameObject go, Dictionary<string, string> styles)
+        internal virtual void ConfigureScrollRect(ScrollRect scrollRect, Dictionary<string, string> styles)
         {
-            ScrollRect scrollRect = go.GetComponent<ScrollRect>();
-            if (scrollRect == null || scrollRect.content == null) return;
-
             RectTransformHelper.FullyFillParent(scrollRect.content);
             RectTransform goRect = scrollRect.GetComponent<RectTransform>();
             scrollRect.horizontal = false;
@@ -559,43 +716,112 @@ namespace Xxhq.Htmltougui.Editor
                 else
                     scrollRect.content.offsetMax = new Vector2(goRect.rect.width - scrollRect.content.rect.width, 0);
             }
-            // 滚动条样式
-            ConfigureScrollbarStyles(scrollRect);
+
+            if (styles.TryGetValue("scrollbar-width", out string scrollbarWidth))
+            {
+                if(scrollbarWidth== "thin")
+                {
+                    scrollRect.verticalScrollbar?.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 8);
+                    scrollRect.horizontalScrollbar?.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 8);
+                }
+            }
+
+            if(styles.TryGetValue("scrollbar-color", out string scrollbarColor))
+            {
+                var split = scrollbarColor.Split(' ');
+                if (split.Length > 1)
+                {
+                    SetScrollbarHandleColor(scrollRect.verticalScrollbar, ColorParser.Parse(split[0]));
+                    SetScrollbarTrackColor(scrollRect.verticalScrollbar, ColorParser.Parse(split[1]));
+                    SetScrollbarHandleColor(scrollRect.horizontalScrollbar, ColorParser.Parse(split[0]));
+                    SetScrollbarTrackColor(scrollRect.horizontalScrollbar, ColorParser.Parse(split[1]));
+                }
+                else
+                {
+                    SetScrollbarHandleColor(scrollRect.verticalScrollbar, ColorParser.Parse(scrollbarColor));
+                    SetScrollbarTrackColor(scrollRect.verticalScrollbar, ColorParser.Parse(scrollbarColor));
+                    SetScrollbarHandleColor(scrollRect.horizontalScrollbar, ColorParser.Parse(scrollbarColor));
+                    SetScrollbarTrackColor(scrollRect.horizontalScrollbar, ColorParser.Parse(scrollbarColor));
+                }
+            }
+        }
+
+        internal virtual void ConfigureScrollRectContentSize(HtmlNode node, Dictionary<string, string> styles, ScrollRect scrollRect)
+        {
+            float maxWidth = 0;
+            float maxHeight = 0;
+            foreach (var child in node.ChildNodes)
+            {
+                if(child.NodeType != HtmlNodeType.Element) continue;
+                var layoutData=  LayoutCalculator.GetLayoutData(scrollRect.content, styles, child);
+                if (layoutData.isAbsoluteLayout)
+                {
+                    if (scrollRect.vertical)
+                    {
+                        var height = UnitParser.Parse(layoutData.y) + UnitParser.Parse(layoutData.height);
+                        if (height > maxHeight)
+                            maxHeight = height;
+                    }
+                    if (scrollRect.horizontal)
+                    {
+                        var width = UnitParser.Parse(layoutData.x) + UnitParser.Parse(layoutData.width);
+                        if (width > maxWidth)
+                            maxWidth = width;
+                    }
+                }
+            }
+
+            if (scrollRect.vertical && maxHeight > 0)
+            {
+                scrollRect.content.anchorMin= new Vector2(0, 1);
+                scrollRect.content.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, maxHeight);
+            }
+            if(scrollRect.horizontal && maxWidth > 0)
+            {
+                scrollRect.content.anchorMax = new Vector2(0, 1);
+                scrollRect.content.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, maxWidth);
+            }
         }
 
         internal virtual void ConfigureScrollbarStyles(ScrollRect scrollRect)
         {
-            if (_pseudoClassStyles.ContainsKey("-webkit-scrollbar"))
+            foreach (var pseudoClass in _cssParser.CurrentPseudoClassStyles)
             {
-                var scrollbarStyle = _pseudoClassStyles["-webkit-scrollbar"];
-                if (scrollbarStyle.TryGetValue("width", out string scrollbarWidth))
-                    scrollRect.verticalScrollbarSpacing = -UnitParser.Parse(scrollbarWidth);
-                if (scrollbarStyle.TryGetValue("height", out string scrollbarHeight))
-                    scrollRect.horizontalScrollbarSpacing = -UnitParser.Parse(scrollbarHeight);
-                if (ColorParser.TryParseBackgroundColor(scrollbarStyle, out Color scrollbarColor))
+                if (pseudoClass.Key== "-webkit-scrollbar")
                 {
-                    var img = scrollRect.GetComponent<Image>();
-                    if (img != null) img.color = scrollbarColor;
+                    var scrollbarStyle = _cssParser.CurrentPseudoClassStyles["-webkit-scrollbar"];
+                    if (scrollbarStyle.TryGetValue("width", out string scrollbarWidth))
+                        scrollRect.verticalScrollbarSpacing = -UnitParser.Parse(scrollbarWidth);
+                    if (scrollbarStyle.TryGetValue("height", out string scrollbarHeight))
+                        scrollRect.horizontalScrollbarSpacing = -UnitParser.Parse(scrollbarHeight);
+                    if (ColorParser.TryParseBackgroundColor(scrollbarStyle, out Color scrollbarColor))
+                    {
+                        var img = scrollRect.GetComponent<Image>();
+                        if (img != null) img.color = scrollbarColor;
+                    }
+                    continue;
                 }
-            }
 
-            if (_pseudoClassStyles.ContainsKey("-webkit-scrollbar-thumb"))
-            {
-                var thumbStyle = _pseudoClassStyles["-webkit-scrollbar-thumb"];
-                if (ColorParser.TryParseBackgroundColor(thumbStyle, out Color thumbColor))
+                if (pseudoClass.Key == "-webkit-scrollbar-thumb")
                 {
-                    SetScrollbarHandleColor(scrollRect.verticalScrollbar, thumbColor);
-                    SetScrollbarHandleColor(scrollRect.horizontalScrollbar, thumbColor);
+                    var thumbStyle = _cssParser.CurrentPseudoClassStyles["-webkit-scrollbar-thumb"];
+                    if (ColorParser.TryParseBackgroundColor(thumbStyle, out Color thumbColor))
+                    {
+                        SetScrollbarHandleColor(scrollRect.verticalScrollbar, thumbColor);
+                        SetScrollbarHandleColor(scrollRect.horizontalScrollbar, thumbColor);
+                    }
+                    continue;
                 }
-            }
 
-            if (_pseudoClassStyles.ContainsKey("-webkit-scrollbar-track"))
-            {
-                var trackStyle = _pseudoClassStyles["-webkit-scrollbar-track"];
-                if (ColorParser.TryParseBackgroundColor(trackStyle, out Color trackColor))
+                if (pseudoClass.Key == "-webkit-scrollbar-track")
                 {
-                    SetScrollbarTrackColor(scrollRect.verticalScrollbar, trackColor);
-                    SetScrollbarTrackColor(scrollRect.horizontalScrollbar, trackColor);
+                    var trackStyle = _cssParser.CurrentPseudoClassStyles["-webkit-scrollbar-track"];
+                    if (ColorParser.TryParseBackgroundColor(trackStyle, out Color trackColor))
+                    {
+                        SetScrollbarTrackColor(scrollRect.verticalScrollbar, trackColor);
+                        SetScrollbarTrackColor(scrollRect.horizontalScrollbar, trackColor);
+                    }
+                    continue;
                 }
             }
         }

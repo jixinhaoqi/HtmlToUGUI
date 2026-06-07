@@ -73,6 +73,50 @@
 
 智能计算器的阈值可在转换窗口的「布局计算器」下调整。
 
+### HTML 元素支持
+
+内置标签处理器映射关系：
+
+| HTML 标签 | UGUI 组件 |
+|---|---|
+| `div` / `span` / `p` | 容器（空 GameObject + RectTransform） |
+| `h1` ~ `h6` | 容器 + Text（字体大小按标题级别缩放） |
+| `button` | Button + Text |
+| `input` | InputField / Toggle / Slider（按 type 区分） |
+| `select` | Dropdown |
+| `img` | Image（支持单模式/多模式/图集） |
+| `textarea` | InputField（多行） |
+| `progress` / `meter` | Slider（不可交互） |
+| ScrollView | ScrollRect（含 Scrollbar 样式） |
+
+ScrollView 额外支持 CSS 属性 `scrollbar-width`（`thin`）和 `scrollbar-color`（`thumb-color track-color`），以及 `::-webkit-scrollbar`/`::-webkit-scrollbar-thumb`/`::-webkit-scrollbar-track` 伪元素样式。Content 尺寸根据子元素位置自动计算。
+
+### 伪类交互状态
+
+支持的 CSS 伪类及其 Unity ColorBlock 映射：
+
+| 伪类 | ColorBlock 属性 |
+|---|---|
+| `:enabled` / 默认 | `normalColor` |
+| `:hover` | `highlightedColor` |
+| `:active` | `pressedColor` |
+| `:disabled` | `disabledColor` |
+| `:selected` / `:focus` / `:checked` | `selectedColor` |
+
+Dropdown 下拉项额外支持独立的伪类颜色设置（`ApplyDropdownItemPseudoColors`），避免与父级 Dropdown 的颜色冲突。
+
+## Hierarchy 右键布局
+
+在 Hierarchy 窗口中选中 UI 元素，右键 → **GameObject → Html To UGUI**，可对现有 UGUI 元素直接应用布局计算器：
+
+| 菜单项 | 说明 |
+|---|---|
+| 应用UI智能布局 | 使用智能布局计算器重新计算锚点和偏移 |
+| 应用UI居中布局 | 将元素及其子级居中于父容器 |
+| 应用UI全拉伸布局 | 将元素拉伸填满父容器 |
+
+布局将递归应用于所有子级元素，自动跳过非激活物体、TMP_SubMeshUI、旋转/缩放物体，并正确处理 ScrollRect 的 Content 节点。
+
 ## SpriteAtlas 工具
 
 在 Project 窗口中选中 **SpriteAtlas** 或 **Sprite(Multiple)** 资源，右键 → **Assets → Html To UGUI → 2D**：
@@ -118,5 +162,7 @@
 
 | 日期 | 说明 |
 |---|---|
+| 2026-06-07 | 新增 HTML 元素支持表、伪类交互状态说明；补充进度条/scrollbar 文档 |
+| 2026-06-05 | 新增 Hierarchy 右键布局菜单说明；SpriteAtlas 菜单重构说明 |
 | 2026-06-04 | 增加游离文本已知限制，移除竞品对比章节 |
 | 2026-05-19 | 初始发布 |

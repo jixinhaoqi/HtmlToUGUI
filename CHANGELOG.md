@@ -3,6 +3,24 @@
 格式基于 [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)，
 版本遵循 [Semantic Versioning](http://semver.org/spec/v2.0.0.html)。
 
+## [0.3.0] - 2026-06-07
+
+### Added
+- Hierarchy 右键布局菜单：选中 UI 元素后右键 → `GameObject/Html To UGUI/`，可应用智能布局/居中布局/全拉伸布局，递归处理子级元素
+- LayoutCalculator.ApplyAbsoluteLayoutStrategy 由 `protected` 改为 `public`，支持外部调用
+- `<progress>` 和 `<meter>` 标签支持，映射到 Slider 组件
+- `:checked` 伪类支持，用于 Toggle/Dropdown 选中状态样式
+- Dropdown 下拉项伪类颜色支持（`ApplyDropdownItemPseudoColors`）
+- ScrollView CSS `scrollbar-width`（`thin`）和 `scrollbar-color` 属性支持；Content 尺寸根据子元素动态计算
+
+### Changed
+- SpriteAtlas 右键菜单重构：菜单路径提取为常量，为 4 个 MenuItem 新增 `Validate` 方法，修复空引用检查
+- Selectable 颜色 setter 重构：`Action<ColorBlock, Color>` 简化为 `Action<Color>`；`MaskableGraphic` 改为 `targetGraphic`
+
+### Fixed
+- 修复字体大小对齐：`fontSize` 统一调整为 `v-1`（TMP 与 Legacy Text 均适用）
+- 修复文本溢出：单行文本同时设置 `verticalOverflow`，防止垂直方向溢出
+
 ## [0.2.0] - 2026-06-05
 
 ### Added
